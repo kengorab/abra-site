@@ -1,0 +1,15 @@
+{
+  "name": "abra_wasm",
+  "collaborators": [
+    "Ken Gorab <ken.gorab@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "abra_wasm_bg.wasm",
+    "abra_wasm.js",
+    "abra_wasm.d.ts"
+  ],
+  "module": "abra_wasm.js",
+  "types": "abra_wasm.d.ts",
+  "sideEffects": "false"
+}
