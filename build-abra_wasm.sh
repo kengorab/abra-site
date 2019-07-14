@@ -16,15 +16,21 @@
 # This means that the compiled wasm file needs to be placed in the public/ directory, so at dev- and
 # build-time, it'll be available to serve statically.
 
+# pwd = root
+git clone git@github.com:kengorab/abra-lang.git
 cd abra-lang
 cargo build
 cd abra_wasm
 wasm-pack build --target web
 cp -R pkg ../../abra_wasm
 
+# pwd = root again
 cd ../..
+rm abra_wasm/.gitignore
 sed 's/^.*import\.meta/\/\/&/' abra_wasm/abra_wasm.js > abra_wasm/abra_wasm_.js
 mv abra_wasm/abra_wasm_.js abra_wasm/abra_wasm.js
 npm i ./abra_wasm
 
 cp abra_wasm/abra_wasm_bg.wasm public/abra_wasm/abra_wasm_bg.wasm
+
+rm -rf abra-lang

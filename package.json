@@ -9,7 +9,9 @@
     "@types/react-dom": "16.8.4",
     "abra_wasm": "file:abra_wasm",
     "code-prettify": "^0.1.0",
+    "codemirror": "^5.48.0",
     "react": "^16.8.6",
+    "react-codemirror2": "^6.0.0",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.1",
     "react-router-hash-link": "^1.2.1",
@@ -26,6 +28,7 @@
     "build-abra_wasm": "rimraf abra_wasm && ./build-abra_wasm.sh"
   },
   "devDependencies": {
+    "@types/codemirror": "0.0.76",
     "@types/react-router-dom": "^4.3.4",
     "@types/react-router-hash-link": "^1.2.1",
     "@types/styled-components": "^4.1.16",

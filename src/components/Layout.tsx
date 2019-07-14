@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
-import logo from '../logo.svg'
+import logo from '../img/logo.svg'
 
 const HEADER_HEIGHT = 40
 
@@ -35,7 +35,7 @@ export function Header() {
           <NavItemLink exact activeClassName="active" to="/">Home</NavItemLink>
           {/*<NavItem href="/">Getting Started</NavItem>*/}
           <NavItemLink exact activeClassName="active" to="/docs">Documentation</NavItemLink>
-          {/*<NavItemLink exact activeClassName="active" to="/try">Try It Out</NavItemLink>*/}
+          <NavItemLink exact activeClassName="active" to="/try">Try It Out</NavItemLink>
           <NavItem href="https://github.com/kengorab/abra-lang" target="_blank">Github</NavItem>
         </Nav>
       </Container>
