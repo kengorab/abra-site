@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { Layout, Header, Main } from './components/Layout'
 import HomePage from './pages/HomePage'
 import Documentation from './pages/Documentation'
+import TryItOutPage from './pages/TryItOutPage'
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
         <Header/>
         <Main>
           <Switch>
+            <Route exact path="/try" component={TryItOutPage}/>
             <Route exact path="/docs" component={Documentation}/>
             <Route exact path="/" component={HomePage}/>
           </Switch>

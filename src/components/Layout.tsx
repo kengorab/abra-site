@@ -35,6 +35,7 @@ export function Header() {
           <NavItemLink exact activeClassName="active" to="/">Home</NavItemLink>
           {/*<NavItem href="/">Getting Started</NavItem>*/}
           <NavItemLink exact activeClassName="active" to="/docs">Documentation</NavItemLink>
+          {/*<NavItemLink exact activeClassName="active" to="/try">Try It Out</NavItemLink>*/}
           <NavItem href="https://github.com/kengorab/abra-lang" target="_blank">Github</NavItem>
         </Nav>
       </Container>
