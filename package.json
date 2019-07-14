@@ -18,6 +18,7 @@
     "typescript": "3.5.3"
   },
   "scripts": {
+    "postinstall": "npm i ./abra_wasm",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
