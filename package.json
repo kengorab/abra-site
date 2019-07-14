@@ -7,9 +7,13 @@
     "@types/node": "12.6.2",
     "@types/react": "16.8.23",
     "@types/react-dom": "16.8.4",
+    "code-prettify": "^0.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-router-dom": "^5.0.1",
+    "react-router-hash-link": "^1.2.1",
     "react-scripts": "3.0.1",
+    "styled-components": "^4.3.2",
     "typescript": "3.5.3"
   },
   "scripts": {
@@ -17,6 +21,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^4.3.4",
+    "@types/react-router-hash-link": "^1.2.1",
+    "@types/styled-components": "^4.1.16"
   },
   "eslintConfig": {
     "extends": "react-app"
