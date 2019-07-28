@@ -93,6 +93,15 @@ function takeObject(idx) {
 * @param {string} input
 * @returns {any}
 */
+export function compile(input) {
+    const ret = wasm.compile(passStringToWasm(input), WASM_VECTOR_LEN);
+    return takeObject(ret);
+}
+
+/**
+* @param {string} input
+* @returns {any}
+*/
 export function run(input) {
     const ret = wasm.run(passStringToWasm(input), WASM_VECTOR_LEN);
     return takeObject(ret);
@@ -122,6 +131,13 @@ function init(module) {
     imports.wbg = {};
     imports.wbg.__wbindgen_json_parse = function(arg0, arg1) {
         const ret = JSON.parse(getStringFromWasm(arg0, arg1));
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
+        takeObject(arg0);
+    };
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        const ret = getStringFromWasm(arg0, arg1);
         return addHeapObject(ret);
     };
 

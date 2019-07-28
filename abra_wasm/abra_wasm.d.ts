@@ -3,6 +3,11 @@
 * @param {string} input 
 * @returns {any} 
 */
+export function compile(input: string): any;
+/**
+* @param {string} input 
+* @returns {any} 
+*/
 export function run(input: string): any;
 
 /**
