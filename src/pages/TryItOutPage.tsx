@@ -45,7 +45,11 @@ export default function TryItOutPage() {
       }
       await abraInitPromise
       const output = await runAsync(code)
-      setOutput(<span>{output}</span>)
+      if (Array.isArray(output)) {
+        setOutput(<span>{`[${output.join(', ')}]`}</span>)
+      } else {
+        setOutput(<span>{output}</span>)
+      }
     } catch (err) {
       setOutput(<span>
         There was an error initializing the abra wasm module. Please verify that your
