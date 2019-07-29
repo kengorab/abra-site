@@ -21,7 +21,7 @@ git clone git@github.com:kengorab/abra-lang.git
 cd abra-lang
 cargo build
 cd abra_wasm
-wasm-pack build --target web
+WASM_PACK_TARGET=web ./build.sh
 cp -R pkg ../../abra_wasm
 
 # pwd = root again
@@ -29,6 +29,9 @@ cd ../..
 rm abra_wasm/.gitignore
 sed 's/^.*import\.meta/\/\/&/' abra_wasm/abra_wasm.js > abra_wasm/abra_wasm_.js
 mv abra_wasm/abra_wasm_.js abra_wasm/abra_wasm.js
+
+# The init function type declaration needs to be added manually, for the WASM_PACK_TARGET=web target
+echo "\nexport default function init(moduleName: string): Promise<any>;" >> abra_wasm/abra_wasm.d.ts
 npm i ./abra_wasm
 
 cp abra_wasm/abra_wasm_bg.wasm public/abra_wasm/abra_wasm_bg.wasm

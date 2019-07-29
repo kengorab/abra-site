@@ -1,22 +1,36 @@
 /* tslint:disable */
-/**
-* @param {string} input 
-* @returns {any} 
-*/
-export function compile(input: string): any;
-/**
-* @param {string} input 
-* @returns {any} 
-*/
-export function run(input: string): any;
+
+import { CompiledModule } from './types/compiled-module'
+import { Error } from './types/error'
+
+export interface CompileSuccess {
+    success: true,
+    compiledModule: CompiledModule
+}
+
+export interface CompileFailure {
+    success: false,
+    error: Error
+}
+
+export type CompileResult = CompileSuccess | CompileFailure
 
 /**
-* If `module_or_path` is {RequestInfo}, makes a request and
-* for everything else, calls `WebAssembly.instantiate` directly.
-*
-* @param {RequestInfo | BufferSource | WebAssembly.Module} module_or_path
-*
-* @returns {Promise<any>}
-*/
-export default function init (module_or_path?: RequestInfo | BufferSource | WebAssembly.Module): Promise<any>;
-        
+ * Compiles the input string as Abra code, using the wasm implementation of the compiler.
+ * This will either return an error if unsuccessful, or a compiled module if successful.
+ */
+export function compile(input: string): CompileResult | null;
+
+/**
+ * Compiles and executes the input string as Abra code, returning the result. This could
+ * result in a runtime error.
+ */
+export function runSync(input: string): Error | any;
+
+/**
+ * Compiles and executes the input string as Abra code, resolving with the
+ * result. This could result in a runtime error, which will also resolve as a successful Promise
+ */
+export function runAsync(input: string): Promise<any>;
+
+export default function init(moduleName: string): Promise<any>;

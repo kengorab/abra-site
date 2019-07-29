@@ -13,22 +13,18 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/material.css'
 import '../abra-lang/abra-mode'
 
-const example = `val greeting = "Hello"
-
-func greet(recipient: String) = greeting + ", " + recipient
-
-val languageName = "Abra"
-greet(languageName)
-`
-
 interface Props {
+  value: string,
   onRun: (code: string) => Promise<any>
 }
 
-export default function Editor({ onRun }: Props) {
+export default function Editor({ value, onRun }: Props) {
   const [running, setRunning] = React.useState(false)
-  const [code, setCode] = React.useState(example)
+  const [code, setCode] = React.useState(value)
   const [useVimMode, setUseVimMode] = React.useState(getSettings().vimModeEnabled)
+
+  // Reset code when props.value changes
+  React.useEffect(() => void setCode(value), [value])
 
   return (
     <>
@@ -61,10 +57,7 @@ export default function Editor({ onRun }: Props) {
             <IconImg src={playButton} alt="Play button"/>
             <span>{running ? 'Running...' : 'Run code'}</span>
           </Button>
-          <Button
-            onClick={() => setCode(example)}
-            disabled={running}
-          >
+          <Button onClick={() => setCode(value)} disabled={running}>
             <IconImg src={resetButton} alt="Reset button"/>
             <span>Reset code</span>
           </Button>

@@ -1,8 +1,33 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import init, { run } from 'abra_wasm'
+import init, { runAsync } from 'abra_wasm'
 import { Section } from '../components/Layout'
 import CodeMirrorEditor from '../components/CodeMirrorEditor'
+import Dropdown from 'react-dropdown'
+import 'react-dropdown/style.css'
+
+type Example = 'greeting' | 'fibonacci'
+
+const codeExamples: Record<Example, string> = {
+  'greeting': `val greeting = "Hello"
+
+func greet(recipient: String) = greeting + ", " + recipient
+
+val languageName = "Abra"
+greet(languageName)
+`,
+  'fibonacci': `func fib(n: Int): Int {
+  if (n == 0) {
+    0
+  } else if (n == 1) {
+    1
+  } else {
+    fib(n - 2) + fib(n - 1)
+  }
+}
+
+fib(10)`
+}
 
 const ExternalLink = ({ href, children }: { href: string, children: string }) =>
   <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
@@ -11,6 +36,7 @@ let abraInitPromise: Promise<any> | null = null
 
 export default function TryItOutPage() {
   const [output, setOutput] = React.useState(<span>Results will appear when code is run</span>)
+  const [example, setExample] = React.useState<Example>('fibonacci')
 
   const runCode = React.useCallback(async (code: string) => {
     try {
@@ -18,9 +44,8 @@ export default function TryItOutPage() {
         abraInitPromise = init('abra_wasm/abra_wasm_bg.wasm')
       }
       await abraInitPromise
-      const output = run(code)
-      console.log('output', output)
-      setOutput(output)
+      const output = await runAsync(code)
+      setOutput(<span>{output}</span>)
     } catch (err) {
       setOutput(<span>
         There was an error initializing the abra wasm module. Please verify that your
@@ -43,8 +68,19 @@ export default function TryItOutPage() {
         Please also note that errors of any kind (syntax, type, etc) will currently <em>not</em> be surfaced in this
         editor. That feature is Coming&nbsp;Soon&nbsp;&trade;.
       </p>
+      <ExampleDropdownContainer>
+        <label>Example</label>
+        <Dropdown
+          value={example}
+          options={[
+            { value: 'greeting', label: 'Basic Greeting' },
+            { value: 'fibonacci', label: 'Fibonacci' }
+          ]}
+          onChange={({ value }) => setExample(value as Example)}
+        />
+      </ExampleDropdownContainer>
 
-      <CodeMirrorEditor onRun={runCode}/>
+      <CodeMirrorEditor value={codeExamples[example]} onRun={runCode}/>
 
       <ResultsView>
         >&nbsp;{output}
@@ -73,5 +109,14 @@ const ResultsView = styled.code`
   a, a:visited {
     color: lightskyblue;
     text-decoration: underline;
+  }
+`
+
+const ExampleDropdownContainer = styled.div`
+  margin-bottom: 12px;
+  
+  label {
+    font-weight: bold;
+    margin-right: 12px;
   }
 `
