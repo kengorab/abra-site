@@ -175,6 +175,25 @@ export default function DocumentationPage() {
             getFullName(firstName: "Turanga", lastName: "Leela")
           `}
         </Code>
+
+        <p>
+          <b>Abra</b> has support for recursive functions, but the function must have an explicit return type annotation.
+          For example:
+        </p>
+        <Code>
+          {`
+            func fib(n: Int): Int {
+            //                ^ Without this, an error would be raised
+              if (n == 0) {
+                0
+              } else if (n == 1) {
+                1
+              } else {
+                fib(n - 2) + fib(n - 1)
+              }
+            }
+          `}
+        </Code>
       </DocSection>
     </Section>
   )
