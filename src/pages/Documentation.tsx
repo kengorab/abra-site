@@ -10,8 +10,8 @@ export default function DocumentationPage() {
       <DocSection>
         <LinkedH2 hash="literals">Literals</LinkedH2>
         <p>
-          <b>Abra</b> has all the literal types you'd expect: integer and floating-point numbers, <br/>
-          booleans, strings, and arrays. (Objects are not yet implemented!).
+          <b>Abra</b> has all the literal types you'd expect: integer and floating-point numbers, booleans, strings, and
+          arrays. (Objects are not yet implemented!).
         </p>
         <Code>
           {`
@@ -177,7 +177,8 @@ export default function DocumentationPage() {
         </Code>
 
         <p>
-          <b>Abra</b> has support for recursive functions, but the function must have an explicit return type annotation.
+          <b>Abra</b> has support for recursive functions, but the function must have an explicit return type
+          annotation.
           For example:
         </p>
         <Code>
@@ -194,6 +195,80 @@ export default function DocumentationPage() {
             }
           `}
         </Code>
+      </DocSection>
+      <DocSection>
+        <LinkedH2 hash="control">Control Flow</LinkedH2>
+
+        <LinkedH3 hash="control-ifelse">If/Else</LinkedH3>
+        <p>
+          Conditional branching logic works in <b>Abra</b> as you might expect, similarly to standard C-like languages:
+          a <code>boolean</code> expression is evaluated for truth or falseness, and then the applicable branch is
+          run. <b>Abra</b> does <em>not</em> have implicitly "truthy" or "falsey" values; a
+          strict <code>boolean</code> type must be passed.
+        </p>
+        <Code>
+          {`
+            val value = 24
+            
+            if (value > 30) {
+              // Do something
+            } else if (value > 20) {
+              // Do something else
+            } else {
+              // Fallback option
+            }
+          `}
+        </Code>
+
+        <p>
+          Where <b>Abra</b> differs from some other languages is in its inclusion of if/else <em>expressions</em>. In
+          other words, an if/else-block can be used anywhere an expression can be used, and the last expression in the
+          block will be its final value (this is similar to functions' return values).
+        </p>
+        <p>
+          When an if/else block is treated as an expression, all branches must result in values of the same type.
+          Branches having different types will be raised in a type error.
+        </p>
+        <Code>
+          {`
+            val tempCelsius = 24
+            val desc = if (tempCelsius > 30) {
+              val emoji = "🥵"
+              "Way too hot! " + emoji
+            } else if (tempCelsius < 5) {
+              val emoji = "🥶"
+              "Too cold! " + emoji
+            } else {
+              "This is perfect!"
+            }
+            desc  // "This is perfect!"
+            
+            val errorExample = if (tempCelsius > 30) {
+              "Too hot!"
+            } else {
+              tempCelsius + 1  // This will result in an error, since both branches have different types
+            }
+          `}
+        </Code>
+
+        <p>
+          It's also allowed to have an if expression without an else clause. This will produce a value whose type is
+          wrapped in an <code>Optional</code> (see <a href="#types">Types</a> for more detail), since we cannot be
+          certain a value is indeed present.
+        </p>
+        <Code>
+          {`
+            val tempCelsius = 24
+            val desc: String? = if (tempCelsius > 5 && tempCelsius < 30) {
+              "Pretty good"
+            }
+          `}
+        </Code>
+
+        <LinkedH3 hash="control-loops">Loops</LinkedH3>
+        <p>
+          <code>// TODO: Loops are not yet implemented</code>
+        </p>
       </DocSection>
     </Section>
   )
