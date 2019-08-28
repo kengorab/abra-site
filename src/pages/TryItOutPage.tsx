@@ -6,7 +6,7 @@ import CodeMirrorEditor from '../components/CodeMirrorEditor'
 import Dropdown from 'react-dropdown'
 import 'react-dropdown/style.css'
 
-type Example = 'greeting' | 'fibonacci'
+type Example = 'greeting' | 'fibonacci' | 'fizzbuzz'
 
 const codeExamples: Record<Example, string> = {
   'greeting': `val greeting = "Hello"
@@ -26,7 +26,20 @@ greet(languageName)
   }
 }
 
-fib(10)`
+fib(10)`,
+  'fizzbuzz': `// Hint: Check the console for println outputs!
+
+for a in range(1, 101) {
+  if a % 15 == 0 {
+    println("Fizzbuzz")
+  } else if a % 3 == 0 {
+    println("Fizz")
+  } else if a % 5 == 0 {
+    println("Buzz")
+  } else {
+    println(a)
+  }
+}`
 }
 
 const ExternalLink = ({ href, children }: { href: string, children: string }) =>
@@ -36,7 +49,7 @@ let abraInitPromise: Promise<any> | null = null
 
 export default function TryItOutPage() {
   const [output, setOutput] = React.useState(<span>Results will appear when code is run</span>)
-  const [example, setExample] = React.useState<Example>('fibonacci')
+  const [example, setExample] = React.useState<Example>('fizzbuzz')
 
   const runCode = React.useCallback(async (code: string) => {
     try {
@@ -70,7 +83,8 @@ export default function TryItOutPage() {
       </p>
       <p>
         Please also note that errors of any kind (syntax, type, etc) will currently <em>not</em> be surfaced in this
-        editor. That feature is Coming&nbsp;Soon&nbsp;&trade;.
+        editor. That feature is Coming&nbsp;Soon&nbsp;&trade;. Also note that any output of
+        the <code>println</code> builtin will be sent to the console, so be sure to check there.
       </p>
       <ExampleDropdownContainer>
         <label>Example</label>
@@ -78,7 +92,8 @@ export default function TryItOutPage() {
           value={example}
           options={[
             { value: 'greeting', label: 'Basic Greeting' },
-            { value: 'fibonacci', label: 'Fibonacci' }
+            { value: 'fibonacci', label: 'Fibonacci' },
+            { value: 'fizzbuzz', label: 'Fizzbuzz' }
           ]}
           onChange={({ value }) => setExample(value as Example)}
         />

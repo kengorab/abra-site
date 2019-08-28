@@ -266,8 +266,73 @@ export default function DocumentationPage() {
         </Code>
 
         <LinkedH3 hash="control-loops">Loops</LinkedH3>
+        <LinkedH4 hash="control-loops-while">While Loops</LinkedH4>
         <p>
-          <code>// TODO: Loops are not yet implemented</code>
+          <b>Abra</b> has <code>while</code>-loops, which encapsulate a block of logic that is meant to run until a
+          given condition is no longer <code>true</code>. This is identical to how <code>while</code>-loops function in
+          other C-like languages. The <code>break</code> keyword can be used to exit a loop early, even if the loop
+          condition may still be true.
+        </p>
+        <Code>
+          {`
+            var a = 0
+            while a < 10 {
+              a = a + 1
+            }
+            a  // 10
+            
+            var b = 0
+            while b < 10 {
+              b = b + 1
+              if b == 3 {
+                break
+              }
+            }
+            b  // 3
+          `}
+        </Code>
+        <LinkedH4 hash="control-loops-for">For Loops</LinkedH4>
+        <p>
+          <b>Abra</b> has <code>for</code>-loops, which encapsulate a block of logic that is meant to run for each item
+          in a specified collection. The collection can either be specified statically, or as any other expression.
+          The <code>range</code> builtin function comes in handy here:
+        </p>
+        <Code>
+          {`
+            var sum = 0
+            for num in [1, 2, 3, 4] {
+              sum = sum + num
+            }
+            sum  // 10
+            
+            var product = 0
+            for num in range(1, 5) {
+              product = product * num
+            }
+            product  // 24
+          `}
+        </Code>
+        <p>
+          In addition to specifying the <em>iteratee</em> variable (<code>num</code> in the above example), you can also
+          specify an <em>index</em> binding. The index binding will be a number equal to the number of times the loop
+          has repeated (zero-indexed).
+        </p>
+        <Code>
+          {`
+            /*
+              This loop will print the following:
+              Number: 5, index: 0
+              Number: 6, index: 1
+              Number: 7, index: 2
+            */
+            for num, i in range(5, 8) {
+              println("Number: " + num + ", index: " + i)
+            }
+          `}
+        </Code>
+        <p>
+          Much like the <code>while</code>-loop, the <code>break</code> keyword can be used to exit a loop early, even
+          if the collection hasn't been fully iterated through.
         </p>
       </DocSection>
     </Section>
@@ -284,4 +349,8 @@ function LinkedH2({ hash, children }: { hash: string, children: string | JSX.Ele
 
 function LinkedH3({ hash, children }: { hash: string, children: string | JSX.Element }) {
   return <h3 id={hash}><HashLink to={`#${hash}`}> {children} </HashLink></h3>
+}
+
+function LinkedH4({ hash, children }: { hash: string, children: string | JSX.Element }) {
+  return <h4 id={hash}><HashLink to={`#${hash}`}> {children} </HashLink></h4>
 }

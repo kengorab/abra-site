@@ -1,5 +1,6 @@
 /* tslint:disable */
 export const memory: WebAssembly.Memory;
+export function disassemble(a: number, b: number): number;
 export function compile(a: number, b: number): number;
 export function runSync(a: number, b: number): number;
 export function runAsync(a: number, b: number): number;

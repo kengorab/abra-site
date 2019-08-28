@@ -17,11 +17,14 @@ export function registerAbraLang() {
   const lexer = window.PR.createSimpleLexer(
     [
       // Whitespace
-      [PR['PR_PLAIN'], /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0'],
+      [PR['PR_PLAIN'], /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0']
     ],
     [
-      // Single-line comments.
+      // Single-line comments
       [PR['PR_COMMENT'], /^\/\/(?:.*)/],
+
+      // Multi-line comments
+      [PR['PR_COMMENT'], /^\/\*[^*]*\*+(?:[^/*][^*]*\*+)*\//],
 
       // Double-quoted strings
       [PR['PR_STRING'], /^r?"("|(?:[^\n\r\f])*?[^\\]")/],
@@ -30,7 +33,7 @@ export function registerAbraLang() {
       [PR['PR_KEYWORD'], /^\b(?:false|true)\b/i],
 
       // Other keywords
-      [PR['PR_KEYWORD'], /^\b(?:func|type|val|var|if|else)\b/i],
+      [PR['PR_KEYWORD'], /^\b(?:func|type|val|var|if|else|for|in|while|break)\b/i],
 
       // Types are typically capitalized
       [PR['PR_TYPE'], /^[A-Z]\w*/],

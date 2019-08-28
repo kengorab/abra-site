@@ -11,7 +11,7 @@ interface ModeState {
 }
 
 CodeMirror.defineMode('abra', () => {
-  const keywords = ['val', 'var', 'func', 'if', 'else']
+  const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break']
   const builtins = ['Bool', 'Int', 'Float', 'String']
   const indentTokens = ['{', '[', '(']
   const unindentTokens = ['}', ']', ')']
@@ -19,9 +19,19 @@ CodeMirror.defineMode('abra', () => {
   function normal(stream: StringStream, state: ModeState) {
     const ch = stream.next()
     if (!ch) return null
+
     if (ch === '"') {
       state.current = string(ch)
       return state.current(stream, state)
+    }
+    if (ch === '/') {
+      if (stream.eat('/')) {
+        stream.skipToEnd()
+        return 'comment'
+      } else if (stream.eat('*')) {
+        state.current = multiLineComment()
+        return 'comment'
+      }
     }
     if (/\d/.test(ch)) {
       stream.eatWhile(/\w.%/)
@@ -37,6 +47,20 @@ CodeMirror.defineMode('abra', () => {
       }
     }
     return null
+  }
+
+  function multiLineComment(): HandlerFn {
+    return function (stream, state) {
+      let ch = stream.next()
+      while (ch) {
+        if (ch === '*' && stream.eat('/')) {
+          state.current = normal
+          return 'comment'
+        }
+        ch = stream.next()
+      }
+      return 'comment'
+    }
   }
 
   function string(quote: string): HandlerFn {
@@ -63,6 +87,8 @@ CodeMirror.defineMode('abra', () => {
       const style = state.current(stream, state)
       const word = stream.current()
 
+      if (style === 'comment') return style
+
       if (style === 'variable') {
         if (keywords.includes(word)) return 'keyword'
         else if (builtins.includes(word)) return 'variable-2'
@@ -81,7 +107,9 @@ CodeMirror.defineMode('abra', () => {
       return state.baseCol + indentUnit * (state.indentDepth - (isClosing ? 1 : 0))
     },
     electricChars: ')]}',
-    lineComment: '//'
+    lineComment: '//',
+    blockCommentStart: '/*',
+    blockCommentEnd: '*/'
   }
   return mode
 })

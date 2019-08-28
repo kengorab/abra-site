@@ -138,9 +138,4 @@ const CodeMirrorStyles = createGlobalStyle`
     border-top-right-radius: 6px;
     padding-top: 12px;
   }
-  
-  .react-codemirror2 {
-    max-height: 200px;
-    overflow-y: scroll;
-  }
 `
