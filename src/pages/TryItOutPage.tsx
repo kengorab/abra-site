@@ -1,10 +1,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import init, { runAsync } from 'abra_wasm'
+import init, { runAsync, disassemble } from 'abra_wasm'
 import { Section } from '../components/Layout'
 import CodeMirrorEditor from '../components/CodeMirrorEditor'
 import Dropdown from 'react-dropdown'
 import 'react-dropdown/style.css'
+import Tabs from '../components/Tabs'
+import Code from '../components/Code'
 
 type Example = 'greeting' | 'fibonacci' | 'fizzbuzz'
 
@@ -49,6 +51,7 @@ let abraInitPromise: Promise<any> | null = null
 
 export default function TryItOutPage() {
   const [output, setOutput] = React.useState(<span>Results will appear when code is run</span>)
+  const [disassembled, setDisassembled] = React.useState('; The compiled bytecode will be displayed here when the "Run code" button is pressed')
   const [example, setExample] = React.useState<Example>('fizzbuzz')
 
   const runCode = React.useCallback(async (code: string) => {
@@ -57,12 +60,6 @@ export default function TryItOutPage() {
         abraInitPromise = init('abra_wasm/abra_wasm_bg.wasm')
       }
       await abraInitPromise
-      const output = await runAsync(code)
-      if (Array.isArray(output)) {
-        setOutput(<span>{`[${output.join(', ')}]`}</span>)
-      } else {
-        setOutput(<span>{output}</span>)
-      }
     } catch (err) {
       setOutput(<span>
         There was an error initializing the abra wasm module. Please verify that your
@@ -70,6 +67,21 @@ export default function TryItOutPage() {
         try again.
       </span>)
       console.error(err)
+      return
+    }
+
+    const result = await runAsync(code)
+    if (Array.isArray(result)) {
+      setOutput(<span>{`[${result.join(', ')}]`}</span>)
+    } else {
+      setOutput(<span>{result}</span>)
+    }
+
+    const output = disassemble(code)
+    if (output && output.success) {
+      setDisassembled(output.disassembled)
+    } else {
+      setDisassembled('There was an error initializing the abra wasm module. Please verify that your browser supports webassembly, or try again.')
     }
   }, [])
 
@@ -101,9 +113,31 @@ export default function TryItOutPage() {
 
       <CodeMirrorEditor value={codeExamples[example]} onRun={runCode}/>
 
-      <ResultsView>
-        >&nbsp;{output}
-      </ResultsView>
+      <Tabs
+        tabs={[
+          {
+            title: 'Results',
+            renderContents: () => (
+              <>
+                <p>Note: Output of <code>println</code> will appear in the console, not in this results box</p>
+                <ResultsView>
+                  >&nbsp;{output}
+                </ResultsView>
+              </>
+            )
+          },
+          {
+            title: 'Bytecode',
+            renderContents: () => (
+              <>
+                <Code language="abrac">
+                  {disassembled}
+                </Code>
+              </>
+            )
+          }
+        ]}
+      />
 
       <h2>What's going on here?</h2>
       <p>
@@ -116,9 +150,9 @@ export default function TryItOutPage() {
 }
 
 const ResultsView = styled.code`
+  flex: 1;
   background-color: #2B2B2B;
   border-radius: 6px;
-  margin-top: 24px;
   color: white;
   padding: 24px;
   font-size: 12px;

@@ -51,3 +51,28 @@ export function registerAbraLang() {
 
   PR.registerLangHandler(lexer, ['abra'])
 }
+
+export function registerAbracLang() {
+  const { PR } = window
+  const lexer = window.PR.createSimpleLexer(
+    [
+      // Whitespace
+      [PR['PR_PLAIN'], /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0']
+    ],
+    [
+      // Single-line comments
+      [PR['PR_COMMENT'], /;\s*.*/],
+
+      // Types are typically capitalized
+      [PR['PR_PLAIN'], /[a-z_]*:/],
+
+      // Numbers
+      [PR['PR_LITERAL'], /^\b\d+(?:\.\d*)?(?:e[+-]?\d+)?/i],
+
+      // Identifiers
+      [PR['PR_KEYWORD'], /^[a-z_$][a-z0-9_]*/i],
+    ]
+  )
+
+  PR.registerLangHandler(lexer, ['abrac'])
+}

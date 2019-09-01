@@ -59,6 +59,7 @@ const HeaderWrapper = styled.header`
   height: ${HEADER_HEIGHT}px;
   background-color: #fff5c2;
   box-shadow: 0 2px 4px #654b472b;
+  z-index: 10;
   position: fixed;
   top: 0;
   left: 0;
