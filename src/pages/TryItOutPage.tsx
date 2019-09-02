@@ -130,7 +130,8 @@ export default function TryItOutPage() {
             title: 'Bytecode',
             renderContents: () => (
               <>
-                <Code language="abrac">
+                <p>Documentation for bytecode instructions can be found <a href="/docs/vm">here</a></p>
+                <Code language="abrac" style={{ marginTop: 0 }}>
                   {disassembled}
                 </Code>
               </>
