@@ -217,7 +217,7 @@ function init(module) {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper482 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper481 = function(arg0, arg1, arg2) {
         const state = { a: arg0, b: arg1, cnt: 1 };
         const real = (arg0) => {
             state.cnt++;
