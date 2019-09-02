@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function Tabs({ tabs }: Props) {
-  const [selected, setSelected] = React.useState(1)
+  const [selected, setSelected] = React.useState(0)
 
   return (
     <div>

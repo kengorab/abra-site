@@ -156,7 +156,29 @@ export default function DocumentationPage() {
             func greaterThan(num1: Int, num2: Int) = num1 > num2
           `}
         </Code>
+        <p>
+          Functions can also be declared with default argument values. This makes those parameters optional when
+          calling that function; if too few parameters are passed, the default value will be provided to the function
+          body. Arguments with default values will have their type be inferred from the default value, if no type
+          annotation is present. Note that all optional (aka default-valued) parameters must come at the end of the
+          argument list; there can be no required (aka <em>non</em>-default-valued) parameters among the optional ones.
+        </p>
+        <Code>
+          {`
+            func add(a: Int, b: Int = 2, c = 3) = a + b + c
+            
+            add(1)  // 6
+            add(1, 10)  // 14
+            add(1, 10, 100)  // 111
+            
+            // Note that here ▾ there is no type annotation; it's inferred from the default value 2
+            func add2(a: Int, b = 2, c: Int) = a + b + c
+            // This is an error here ^ since required params 
+            // cannot come after optional ones
+          `}
+        </Code>
 
+        <LinkedH3 hash="functions-calling">Calling Functions</LinkedH3>
         <p>
           Functions are called by using parentheses to pass in arguments, much like you'd expect. In <b>Abra</b>, you
           may take a <em>named-arguments</em> approach to provide additional clarity, but the arguments must be passed

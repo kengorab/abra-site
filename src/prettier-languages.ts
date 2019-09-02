@@ -60,16 +60,16 @@ export function registerAbracLang() {
       [PR['PR_PLAIN'], /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0']
     ],
     [
-      // Single-line comments
+      // Comments
       [PR['PR_COMMENT'], /;\s*.*/],
 
-      // Types are typically capitalized
-      [PR['PR_PLAIN'], /[a-z_]*:/],
+      // Labels
+      [PR['PR_PLAIN'], /[a-z_$0-9]*:/],
 
       // Numbers
       [PR['PR_LITERAL'], /^\b\d+(?:\.\d*)?(?:e[+-]?\d+)?/i],
 
-      // Identifiers
+      // Instructions
       [PR['PR_KEYWORD'], /^[a-z_$][a-z0-9_]*/i],
     ]
   )
