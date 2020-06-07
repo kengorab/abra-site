@@ -125,11 +125,6 @@ export default function DocumentationPage() {
             "hello" ?: "world" // Type error, since the left-hand side "hello" is not an Optional
           `}
         </Code>
-
-        <LinkedH3 hash="types-creating">Creating Types</LinkedH3>
-        <p>
-          <code>// TODO: Creating types is not yet implemented</code>
-        </p>
       </DocSection>
 
       <DocSection>
@@ -146,56 +141,61 @@ export default function DocumentationPage() {
         </p>
         <Code>
           {`
-            func greaterThan(num1: Int, num2: Int): Bool {
-              val gt = num1 > num2
-              gt
-            }
-            
-            // The above function could also be written like this, omitting the return 
-            // type annotation and condensing the function body into a single expression
-            func greaterThan(num1: Int, num2: Int) = num1 > num2
-          `}
+          func greaterThan(num1: Int, num2: Int): Bool {
+            val gt = num1 > num2
+            gt
+          }
+          
+          // The above function could also be written like this, omitting the return 
+          // type annotation and condensing the function body into a single expression
+          func greaterThan(num1: Int, num2: Int) = num1 > num2
+        `}
         </Code>
         <p>
           Functions can also be declared with default argument values. This makes those parameters optional when
-          calling that function; if too few parameters are passed, the default value will be provided to the function
+          calling that function; if no value for that parameter is passed, the default value will be provided to the function
           body. Arguments with default values will have their type be inferred from the default value, if no type
           annotation is present. Note that all optional (aka default-valued) parameters must come at the end of the
           argument list; there can be no required (aka <em>non</em>-default-valued) parameters among the optional ones.
         </p>
         <Code>
           {`
-            func add(a: Int, b: Int = 2, c = 3) = a + b + c
-            
-            add(1)  // 6
-            add(1, 10)  // 14
-            add(1, 10, 100)  // 111
-            
-            // Note that here ▾ there is no type annotation; it's inferred from the default value 2
-            func add2(a: Int, b = 2, c: Int) = a + b + c
-            // This is an error here ^ since required params 
-            // cannot come after optional ones
-          `}
+          func add(a: Int, b: Int = 2, c = 3) = a + b + c
+          
+          add(1)  // 6
+          add(1, 10)  // 14
+          add(1, 10, 100)  // 111
+          
+          // Note that here ▾ there is no type annotation; it's inferred from the default value 2
+          func add2(a: Int, b = 2, c: Int) = a + b + c
+          // This is an error here ^ since required params 
+          // cannot come after optional ones
+        `}
         </Code>
 
         <LinkedH3 hash="functions-calling">Calling Functions</LinkedH3>
         <p>
           Functions are called by using parentheses to pass in arguments, much like you'd expect. In <b>Abra</b>, you
-          may take a <em>named-arguments</em> approach to provide additional clarity, but the arguments must be passed
-          in the expected order (the attached argument names are just to enhance readability). Any number of arguments
-          may be named (it's not all-or-nothing), and it's especially recommended to use named-arguments when passing in
-          a literal value (as opposed to a variable, which can have some intent ascribed to it via its name).
+          may take a <em>named-arguments</em> approach to provide additional clarity. These named arguments may be passed
+          in any order, but you cannot mix named and unnamed parameters (it's all or nothing). It's especially helpful
+          to use named-arguments when passing in a literal value (as opposed to a variable, which can have some intent
+          ascribed to it via its name).
+        </p>
+        <p>
+          Parameters with default values will be set to those values upon calling the function. The default value will
+          be provided if not enough positional arguments were passed (if calling with unnamed arguments), or if no value
+          is provided as a named argument for that parameter.
         </p>
         <Code>
           {`
-            func getFullName(firstName: String, lastName: String) = firstName + " " + lastName
-            
-            getFullName("Turanga", "Leela")
-            
-            // To help reduce ambiguity ("did the firstName parameter come first, or the 
-            // lastName?"), you can use named-arguments
-            getFullName(firstName: "Turanga", lastName: "Leela")
-          `}
+          func getFullName(firstName: String, lastName: String) = firstName + " " + lastName
+          
+          getFullName("Turanga", "Leela")
+          
+          // To help reduce ambiguity ("did the firstName parameter come first, or the 
+          // lastName?"), you can use named-arguments
+          getFullName(firstName: "Turanga", lastName: "Leela")
+        `}
         </Code>
 
         <p>
@@ -205,19 +205,98 @@ export default function DocumentationPage() {
         </p>
         <Code>
           {`
-            func fib(n: Int): Int {
-            //                ^ Without this, an error would be raised
-              if (n == 0) {
-                0
-              } else if (n == 1) {
-                1
-              } else {
-                fib(n - 2) + fib(n - 1)
-              }
+          func fib(n: Int): Int {
+          //                ^ Without this, an error would be raised
+            if (n == 0) {
+              0
+            } else if (n == 1) {
+              1
+            } else {
+              fib(n - 2) + fib(n - 1)
+            }
+          }
+        `}
+        </Code>
+      </DocSection>
+
+      <DocSection>
+        <LinkedH2 hash="types-creating">Creating Types</LinkedH2>
+        <p>
+          You can create your own type in <b>Abra</b> by using the <code>type</code> keyword, giving it a name, and
+          defining its shape. Here we can see a type representing a person, with 2 fields, <code>firstName</code> and
+          <code>lastName</code>, each of type <code>String</code>.
+        </p>
+        <Code>
+          {`
+            type Person {
+              firstName: String
+              lastName: String
             }
           `}
         </Code>
+        <p>
+          When a type is declared in this way, there will also be a function declared with the same name as the type, which
+          has arguments that match that type's fields. This is like a <i>constructor</i> in other languages, and is used to
+          create new instances of that type. Much like how regular function work (see the section above on Functions), these
+          parameters can be passed in any order.
+        </p>
+        <Code>
+          {`
+            val leela = Person(firstName: "Turanga", lastName: "Leela")
+          `}
+        </Code>
+        <p>
+          You can also specify default values for a type's fields. These will become optional arguments in
+          the <i>constructor</i> function for that type.
+        </p>
+        <Code>
+          {`
+            type Person {
+              firstName: String = "Turanga"
+              lastName: String
+            }
+            
+            val leela = Person(lastName: "Leela")
+            println(leela.firstName) // Prints "Turanga", the default value
+          `}
+        </Code>
+        <p>
+          Fields on an instance of a type can be accessed using the dot operator, much like you may be used to from other
+          languages. You can also use the same idea to update an instance's fields.
+        </p>
+        <Code>
+          {`
+            val leela = Person(firstName: "turanga", lastName: "leela")
+            val fullName = leela.firstName + " " + leela.lastName
+            
+            leela.firstName = "Turanga"
+            leela.lastName = "Leela"
+          `}
+        </Code>
+
+        <LinkedH3 hash="types-creating-methods">Methods on Types</LinkedH3>
+        <p>
+          Methods can also be declared within a <code>type</code> declaration. Functions with <code>self</code> as the first
+          parameter will be <i>instance methods</i>, and functions without <code>self</code> will be <i>static methods</i>.
+        </p>
+        <Code>
+          {`
+            type Person {
+              name: String
+              
+              func yellName(self) = self.name.toUpper() + "!"
+              
+              func isLeela(name: String) = name == "Leela" || name == "Turanga Leela"
+            }
+            
+            val leela = Person(name: "Leela")
+            println(leela.yellName()) // Prints "LEELA!"
+            
+            Person.isLeela(leela.name) // true
+          `}
+        </Code>
       </DocSection>
+
       <DocSection>
         <LinkedH2 hash="control">Control Flow</LinkedH2>
 
