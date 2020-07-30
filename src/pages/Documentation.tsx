@@ -11,7 +11,7 @@ export default function DocumentationPage() {
         <LinkedH2 hash="literals">Literals</LinkedH2>
         <p>
           <b>Abra</b> has all the literal types you'd expect: integer and floating-point numbers, booleans, strings, and
-          arrays. (Objects are not yet implemented!).
+          arrays.
         </p>
         <Code>
           {`
@@ -63,11 +63,6 @@ export default function DocumentationPage() {
             favoriteColor = "purple" // This works just fine
           `}
         </Code>
-
-        <LinkedH3 hash="variables-destructuring">Destructuring</LinkedH3>
-        <p>
-          <code>// TODO: Variable declaration via destructuring is not yet implemented</code>
-        </p>
       </DocSection>
 
       <DocSection>
@@ -88,6 +83,7 @@ export default function DocumentationPage() {
             Int[][] // eg. [[1, 2], [3, 4]]
           `}
         </Code>
+        <LinkedH3 hash="types-option">Option Type</LinkedH3>
         <p>
           There's another special type in <b>Abra</b> called the <code>Option</code> type, which is denoted with the
           question-mark (<code>?</code>) suffix. This represents a value that <em>may</em> contain a value of that type,
@@ -108,10 +104,9 @@ export default function DocumentationPage() {
           existed at such an index, and some languages throw an exception and give up.
         </p>
         <p>
-          <b>Abra</b> takes the middle
-          road: an array indexing operation will always succeed and will always return a "box", which may or may not
-          contain a value. One way to "unbox" this value is to use the <em>coalescing</em> operator (<code>?:</code>),
-          also called the "Elvis operator" in some languages. This operator will either unbox
+          <b>Abra</b> takes the middle road: an array indexing operation will always succeed and will always return a
+          "box", which may or may not contain a value. One way to "unbox" this value is to use the <em>coalescing</em>
+          operator (<code>?:</code>), also called the "Elvis operator" in some languages. This operator will either unbox
           the <code>Optional</code> and return what's inside, or will provide a given fallback.
         </p>
         <Code>
@@ -125,6 +120,27 @@ export default function DocumentationPage() {
             "hello" ?: "world" // Type error, since the left-hand side "hello" is not an Optional
           `}
         </Code>
+        <p>
+          There's another operator that makes it convenient to work with <code>Optional</code> types: the <code>?.</code>
+          operator. This allows for an <code>Optional</code>-safe way of accessing properties of variables without manually
+          "unwrapping" the value. For example, if we wanted to get the length of a string contained within an array:
+        </p>
+        <Code>
+          {`
+            val names = ["Brian", "Ken", "Meg"]
+            
+            val brian: String? = names[0] // The type of brian is an Optional String
+            val wrongLength = brian.length // Type error, since the property "length" does not exist on String?
+            val rightLength = brian?.length // This is correct
+          `}
+        </Code>
+        <p>
+          The <code>rightLength</code> variable will be of type <code>Int?</code>. Essentially, what happens here is
+          this: since the code can't be sure if the variable <code>brian</code> holds a value or not, we can use the
+          <code>Optional</code>-safe operator (<code>?.</code>) to access its <code>length</code> property. If the variable
+          holds a value, it will get the <code>length</code> property off of the variable; if it does <i>not</i> hold a
+          value, it will just short-circuit and produce the value of <code>None</code>.
+        </p>
       </DocSection>
 
       <DocSection>
@@ -149,7 +165,7 @@ export default function DocumentationPage() {
           // The above function could also be written like this, omitting the return 
           // type annotation and condensing the function body into a single expression
           func greaterThan(num1: Int, num2: Int) = num1 > num2
-        `}
+          `}
         </Code>
         <p>
           Functions can also be declared with default argument values. This makes those parameters optional when
@@ -170,7 +186,7 @@ export default function DocumentationPage() {
           func add2(a: Int, b = 2, c: Int) = a + b + c
           // This is an error here ^ since required params 
           // cannot come after optional ones
-        `}
+          `}
         </Code>
 
         <LinkedH3 hash="functions-calling">Calling Functions</LinkedH3>
@@ -195,9 +211,58 @@ export default function DocumentationPage() {
           // To help reduce ambiguity ("did the firstName parameter come first, or the 
           // lastName?"), you can use named-arguments
           getFullName(firstName: "Turanga", lastName: "Leela")
-        `}
+          `}
         </Code>
 
+        <LinkedH3 hash="functions-lambdas">Lambda Functions</LinkedH3>
+        <p>
+          There's also a syntax for anonymous lambda functions in <b>Abra</b>, which follows after Typescript's arrow
+          function syntax. Arguments are in parentheses followed by their type annotations, then an arrow (<code>=></code>)
+          and then either a single expression or a block.
+        </p>
+        <Code>
+          {`
+          val add = (a: Int, b: Int) => a + b
+          val mult = (a: Int, b: Int) => {
+            var product = a
+            for i in range(0, b) {
+              product = product + a
+            }
+            product
+          }
+          `}
+        </Code>
+        <p>
+          Functions in <b>Abra</b> are first-class citizens, so they can be passed as arguments to other functions. When
+          passing lambdas as arguments, the type annotations for arguments are optional.
+        </p>
+        <p>
+          It's also important to note that regular named functions can also be passed as parameters!
+        </p>
+        <Code>
+          {`
+          func call(fn: (Int) => Int, number: Int) = fn(number)
+          
+          call(x => x + 1, 23) // Returns 24
+          
+          func increment(value: Int) = value + 1
+          call(increment, 23) // Also returns 24
+          `}
+        </Code>
+        <p>
+          A function will satisfy a function type signature if all of its <i>required</i> arguments match; any optional
+          arguments are not typechecked against the type signature:
+        </p>
+        <Code>
+          {`
+          func call(fn: (Int) => Int, number: Int) = fn(number)
+          
+          call((x, y = 1) => x + y + 1, 22) // Returns 24
+          //       ^ The argument y will always be set to the default value
+          `}
+        </Code>
+
+        <LinkedH3 hash="functions-recursion">Recursive Functions</LinkedH3>
         <p>
           <b>Abra</b> has support for recursive functions, but the function must have an explicit return type
           annotation.
@@ -215,7 +280,7 @@ export default function DocumentationPage() {
               fib(n - 2) + fib(n - 1)
             }
           }
-        `}
+          `}
         </Code>
       </DocSection>
 
