@@ -7,12 +7,12 @@ type HandlerFn = (stream: StringStream, state: ModeState) => string | null
 interface ModeState {
   baseCol: number,
   indentDepth: number,
-  current: HandlerFn
+  current: HandlerFn,
+  definedTypes: string[]
 }
 
 CodeMirror.defineMode('abra', () => {
-  const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break']
-  const builtins = ['Bool', 'Int', 'Float', 'String']
+  const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break', 'type', 'None', 'self']
   const indentTokens = ['{', '[', '(']
   const unindentTokens = ['}', ']', ')']
 
@@ -78,20 +78,41 @@ CodeMirror.defineMode('abra', () => {
     }
   }
 
+  function type(stream: StringStream, state: ModeState) {
+    const typeName = []
+    let ch = stream.next()
+    while (ch && /\S/.test(ch)) {
+      typeName.push(ch)
+      ch = stream.next()
+    }
+    state.definedTypes.push(typeName.join(''))
+    state.current = normal
+    return 'variable-2'
+  }
+
   const mode: Mode<ModeState> = {
     startState() {
-      return { baseCol: 0, indentDepth: 0, current: normal }
+      return {
+        baseCol: 0,
+        indentDepth: 0,
+        current: normal,
+        definedTypes: ['Bool', 'Int', 'Float', 'String', 'Unit']
+      }
     },
     token(stream, state) {
       if (stream.eatSpace()) return null
       const style = state.current(stream, state)
       const word = stream.current()
 
+      if (word === 'type') {
+        state.current = type
+      }
+
       if (style === 'comment') return style
 
       if (style === 'variable') {
         if (keywords.includes(word)) return 'keyword'
-        else if (builtins.includes(word)) return 'variable-2'
+        else if (state.definedTypes.includes(word)) return 'variable-2'
         return null
       }
 

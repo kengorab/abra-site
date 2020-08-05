@@ -43,7 +43,7 @@ const TabsList = styled.ul`
 
 const TabItem = styled.li`
   font-size: 14px;
-  padding: 12px 18px;
+  padding: 6px 12px;
   cursor: pointer;
   background-color: white;
   transition: all 300ms ease-in-out;
