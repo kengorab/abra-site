@@ -3,11 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/jest": "24.0.15",
-    "@types/node": "12.6.2",
-    "@types/react": "16.8.23",
-    "@types/react-dom": "16.8.4",
-    "abra_wasm": "file:abra_wasm",
+    "@kengorab/abra_wasm": "0.4.0",
     "code-prettify": "^0.1.0",
     "codemirror": "^5.48.0",
     "react": "^16.8.6",
@@ -21,19 +17,20 @@
     "typescript": "3.5.3"
   },
   "scripts": {
-    "postinstall": "npm i ./abra_wasm",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build-abra_wasm": "rimraf abra_wasm && ./build-abra_wasm.sh"
+    "eject": "react-scripts eject"
   },
   "devDependencies": {
     "@types/codemirror": "0.0.76",
+    "@types/jest": "24.0.15",
+    "@types/node": "12.6.2",
+    "@types/react": "16.8.23",
+    "@types/react-dom": "16.8.4",
     "@types/react-router-dom": "^4.3.4",
     "@types/react-router-hash-link": "^1.2.1",
-    "@types/styled-components": "^4.1.16",
-    "rimraf": "^2.6.3"
+    "@types/styled-components": "^4.1.16"
   },
   "eslintConfig": {
     "extends": "react-app"

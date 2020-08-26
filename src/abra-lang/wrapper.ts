@@ -1,4 +1,4 @@
-import * as Abra from 'abra_wasm'
+import * as Abra from '@kengorab/abra_wasm'
 
 const _init = Abra.default
 
