@@ -1,15 +1,13 @@
 export default `
-// We don't have generics yet, so this LinkedList will only work for Strings
-  
-type Node {
-  value: String
-  next: Node? = None
+type Node<T> {
+  value: T
+  next: Node<T>? = None
 }
 
-type LinkedList {
-  head: Node? = None
+type LinkedList<T> {
+  head: Node<T>? = None
 
-  func push(self, item: String): LinkedList { 
+  func push(self, item: T): LinkedList<T> { 
     if self.head |head| {
       var node = head
       while node.next |n| { node = n }
@@ -20,8 +18,18 @@ type LinkedList {
  
     self
   }
+  
+  func map<U>(self, fn: (T) => U): U[] {
+    val newArr: U[] = []
 
-  func forEach(self, fn: (String) => Unit): Unit {
+    self.forEach(item => {
+      newArr.push(fn(item))
+    })
+    
+    newArr
+  }
+
+  func forEach(self, fn: (T) => Unit): Unit {
     var node = self.head
     while node |n| {
       fn(n.value)
@@ -30,14 +38,11 @@ type LinkedList {
   }
 }
 
-val list = LinkedList()
-  .push("a")
-  .push("b")
-  .push("c")
-  .push("d")
+val list = LinkedList<String>()
+list.push("a")
+  .push("bc")
+  .push("def")
+  .push("ghij")
 
-// Iterate through the LinkedList, and push items into an array
-var arr = []
-list.forEach(item => arr.push(item))
-arr
+list.map<Int>(item => item.length)
 `.trimStart()

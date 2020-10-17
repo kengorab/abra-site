@@ -105,9 +105,9 @@ export default function DocumentationPage() {
         </p>
         <p>
           <b>Abra</b> takes the middle road: an array indexing operation will always succeed and will always return a
-          "box", which may or may not contain a value. One way to "unbox" this value is to use the <em>coalescing</em>
-          operator (<code>?:</code>), also called the "Elvis operator" in some languages. This operator will either unbox
-          the <code>Optional</code> and return what's inside, or will provide a given fallback.
+          "box", which may or may not contain a value. One way to "unbox" this value is to use
+          the <em>coalescing</em> operator (<code>?:</code>), also called the "Elvis operator" in some languages. This
+          operator will either unbox the <code>Optional</code> and return what's inside, or will provide a given fallback.
         </p>
         <Code>
           {`
@@ -370,7 +370,8 @@ export default function DocumentationPage() {
           Conditional branching logic works in <b>Abra</b> as you might expect, similarly to standard C-like languages:
           a <code>boolean</code> expression is evaluated for truth or falseness, and then the applicable branch is
           run. <b>Abra</b> does <em>not</em> have implicitly "truthy" or "falsey" values; a
-          strict <code>boolean</code> type must be passed.
+          strict <code>boolean</code> or <code>Optional</code> type must be passed (more on the use
+          of <code>Optional</code> values in if-conditions <a href="#control-convenience-variables">later on</a>).
         </p>
         <Code>
           {`
@@ -500,6 +501,47 @@ export default function DocumentationPage() {
           Much like the <code>while</code>-loop, the <code>break</code> keyword can be used to exit a loop early, even
           if the collection hasn't been fully iterated through.
         </p>
+
+        <LinkedH3 hash="control-convenience-variables">Convenience variables</LinkedH3>
+        <p>
+          Oftentimes it's useful in control structures to have a convenient way to access the evaluated condition. For
+          cases where the condition is a <code>boolean</code> it might not be apparent, but it <em>is</em> useful when the
+          condition is an <code>Optional</code>.
+        </p>
+        <Code>
+          {`
+            val arr = [1, 2, 3]
+            if arr[4] |number| {  // \`number\` will equal arr[4] if it exists
+              println("The number was " + number)
+            } else {
+              println("There was no number at index 4")
+            }
+          `}
+        </Code>
+        <p>
+          If this is done for a <code>boolean</code> condition, the variable is guaranteed to always be <code>true</code>,
+          so while it is possible to write code such as the following, it's not very useful:
+        </p>
+        <Code>
+          {`
+            if a > 4 |res| {
+              println("Res will always be true, otherwise we couldn't have gotten here")
+            }
+          `}
+        </Code>
+        <p>
+          This construct can be used in <code>while</code> loops as well!
+        </p>
+        <Code>
+          {`
+            val arr = [1, 2, 3]
+            var idx = 0
+            while arr[idx] |number| {
+              println("Got number: " + number)
+              idx += 1
+            }
+          `}
+        </Code>
       </DocSection>
     </Section>
   )

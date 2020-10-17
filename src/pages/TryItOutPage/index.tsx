@@ -11,14 +11,16 @@ import greeting from './examples/greeting'
 import fibonacci from './examples/fibonacci'
 import fizzbuzz from './examples/fizzbuzz'
 import linkedList from './examples/linked-list'
+import enums from './examples/enums'
 
-type Example = 'greeting' | 'fibonacci' | 'fizzbuzz' | 'linked-list'
+type Example = 'greeting' | 'fibonacci' | 'fizzbuzz' | 'linked-list' | 'enums'
 
 const codeExamples: Record<Example, string> = {
   'greeting': greeting,
   'fibonacci': fibonacci,
   'fizzbuzz': fizzbuzz,
-  'linked-list': linkedList
+  'linked-list': linkedList,
+  'enums': enums,
 }
 
 const ExternalLink = ({ href, children }: { href: string, children: string }) =>
@@ -36,7 +38,7 @@ export default function TryItOutPage() {
   const [output, setOutput] = React.useState(<span>Results will appear when code is run</span>)
   const [isError, setIsError] = React.useState(false)
   const [disassembled, setDisassembled] = React.useState('; The compiled bytecode will be displayed here when the "Run code" button is pressed')
-  const [example, setExample] = React.useState<Example>('greeting')
+  const [example, setExample] = React.useState<Example>('linked-list')
 
   const handleNoWasm = React.useCallback(() => {
     setOutput(noWasmMessage)
@@ -75,7 +77,8 @@ export default function TryItOutPage() {
                 { value: 'greeting', label: 'Basic Greeting' },
                 { value: 'fibonacci', label: 'Fibonacci' },
                 { value: 'fizzbuzz', label: 'Fizzbuzz' },
-                { value: 'linked-list', label: 'Linked List (ish)' }
+                { value: 'linked-list', label: 'Linked List (ish)' },
+                { value: 'enums', label: 'Enums' },
               ]}
               onChange={({ value }) => {
                 setExample(value as Example)

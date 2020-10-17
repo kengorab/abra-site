@@ -12,7 +12,7 @@ interface ModeState {
 }
 
 CodeMirror.defineMode('abra', () => {
-  const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break', 'type', 'None', 'self']
+  const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break', 'type', 'None', 'self', 'enum']
   const indentTokens = ['{', '[', '(']
   const unindentTokens = ['}', ']', ')']
 
@@ -42,9 +42,21 @@ CodeMirror.defineMode('abra', () => {
       if (stream.eat('(')) {
         stream.backUp(1)
         return 'qualifier'
-      } else {
-        return 'variable'
+      } else if (stream.eat('<')) {
+        let backupNum = 1
+        let ch = stream.peek()
+        while (ch && ch !== '>') {
+          ch = stream.next()
+          backupNum++
+        }
+        if (stream.next() === '(') {
+          stream.backUp(backupNum + 1)
+          return 'qualifier'
+        }
+        stream.backUp(backupNum - 1)
       }
+
+      return 'variable'
     }
     return null
   }
@@ -80,10 +92,10 @@ CodeMirror.defineMode('abra', () => {
 
   function type(stream: StringStream, state: ModeState) {
     const typeName = []
-    let ch = stream.next()
-    while (ch && /\S/.test(ch)) {
-      typeName.push(ch)
-      ch = stream.next()
+    let ch = stream.peek()
+    while (ch && /\w/.test(ch)) {
+      typeName.push(stream.next())
+      ch = stream.peek()
     }
     state.definedTypes.push(typeName.join(''))
     state.current = normal
@@ -104,7 +116,7 @@ CodeMirror.defineMode('abra', () => {
       const style = state.current(stream, state)
       const word = stream.current()
 
-      if (word === 'type') {
+      if (word === 'type' || word === 'enum') {
         state.current = type
       }
 
@@ -112,7 +124,16 @@ CodeMirror.defineMode('abra', () => {
 
       if (style === 'variable') {
         if (keywords.includes(word)) return 'keyword'
-        else if (state.definedTypes.includes(word)) return 'variable-2'
+        else {
+          if (state.definedTypes.includes(word)) return 'variable-2'
+          if (!word.includes('<')) return null
+
+          const baseType = word.substring(0, word.indexOf('<'));
+          if (state.definedTypes.includes(baseType)) {
+            stream.backUp(word.length - baseType.length)
+            return 'variable-2'
+          }
+        }
         return null
       }
 
