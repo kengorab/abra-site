@@ -18,7 +18,8 @@ import '../abra-lang/abra-mode'
 interface Props {
   value: string,
   onCheck: (error: 'wasm' | string | null) => void,
-  onRun: (result: any, error: string | null, code: string) => void
+  onRunStart: () => void,
+  onRunEnd: (result: any, error: string | null, code: string) => void
 }
 
 interface State {
@@ -60,7 +61,10 @@ export default class AbraEditor extends React.Component<Props, State> {
   }
 
   run = async () => {
+    const { onRunStart, onRunEnd } = this.props
     const { code } = this.state
+
+    onRunStart()
 
     this.setState({ isRunning: true })
 
@@ -68,13 +72,13 @@ export default class AbraEditor extends React.Component<Props, State> {
       const result = await run(code)
       if (result.success) {
         const { data } = result
-        this.props.onRun(data, null, code)
+        onRunEnd(data, null, code)
       } else {
-        this.props.onRun(null, result.errorMessage.trimStart(), code)
+        onRunEnd(null, result.errorMessage.trimStart(), code)
       }
     } catch (e) {
       console.error(e)
-      this.props.onRun(null, 'Something went wrong, check console', code)
+      onRunEnd(null, 'Something went wrong, check console', code)
     } finally {
       this.setState({ isRunning: false })
     }

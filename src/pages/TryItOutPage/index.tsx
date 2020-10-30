@@ -20,7 +20,7 @@ const codeExamples: Record<Example, string> = {
   'fibonacci': fibonacci,
   'fizzbuzz': fizzbuzz,
   'linked-list': linkedList,
-  'enums': enums,
+  'enums': enums
 }
 
 const ExternalLink = ({ href, children }: { href: string, children: string }) =>
@@ -34,97 +34,141 @@ const noWasmMessage = (
   </span>
 )
 
-export default function TryItOutPage() {
-  const [output, setOutput] = React.useState(<span>Results will appear when code is run</span>)
-  const [isError, setIsError] = React.useState(false)
-  const [disassembled, setDisassembled] = React.useState('; The compiled bytecode will be displayed here when the "Run code" button is pressed')
-  const [example, setExample] = React.useState<Example>('linked-list')
+const defaultOutput = <span>Results will appear when code is run</span>
 
-  const handleNoWasm = React.useCallback(() => {
-    setOutput(noWasmMessage)
-    setDisassembled('There was an error initializing the abra wasm module. Please verify that your browser supports webassembly, or try again.')
-  }, [])
+interface State {
+  output: JSX.Element[],
+  isError: boolean,
+  disassembled: string,
+  example: Example
+}
 
-  const onCheckCode = React.useCallback(async (error: 'wasm' | string | null) => {
-    if (error === 'wasm') return handleNoWasm
+export default class TryItOutPage extends React.Component<{}, State> {
+  constructor(props: {}) {
+    super(props)
 
-    const output = error ? <pre>{error}</pre> : <span/>
-    setOutput(output)
-    setIsError(!!error)
-  }, [handleNoWasm])
+    this.state = {
+      output: [defaultOutput],
+      isError: false,
+      disassembled: '; The compiled bytecode will be displayed here when the "Run code" button is pressed',
+      example: 'linked-list'
+    }
+  }
 
-  const onRunCode = React.useCallback(async (result: any, error: string | null, code: string) => {
-    const output = error ? <pre>{error}</pre> : <span>{JSON.stringify(result)}</span>
-    setOutput(output)
+  componentDidMount() {
+    window.__abra_func__println = (...args: any[]) => {
+      this.setState({
+        output: [...this.state.output, <span>{args.join(' ')}</span>]
+      })
+    }
+  }
+
+  handleNoWasm = () => {
+    this.setState({
+      output: [noWasmMessage],
+      disassembled: 'There was an error initializing the abra wasm module. Please verify that your browser supports webassembly, or try again.'
+    })
+  }
+
+  handleCheckCode = async (error: 'wasm' | string | null) => {
+    if (error === 'wasm') return this.handleNoWasm()
+
+    // Don't modify output if there's no error now and there wasn't before
+    if (!error && !this.state.isError) return
+
+    const output = error ? <pre>{error}</pre> : defaultOutput
+    this.setState({ output: [output], isError: !!error })
+  }
+
+  handleRunStart = () => this.setState({ output: [] })
+
+  handleRunEnd = async (result: any, error: string | null, code: string) => {
+    if (error) {
+      this.setState({ output: ([<pre>{error}</pre>]) })
+    } else if (result) {
+      this.setState({ output: ([...this.state.output, <span>{JSON.stringify(result)}</span>]) })
+    }
 
     const disassembly = await disassemble(code)
     if (disassembly && disassembly.success) {
-      setDisassembled(disassembly.disassembled)
+      this.setState({ disassembled: disassembly.disassembled })
     }
-  }, [])
+  }
 
-  return (
-    <Section>
-      <Title>
-        Try It Out
-        <ExampleDropdownContainer>
-          <label>Example</label>
-          <div style={{ width: 200 }}>
-            <Dropdown
-              className="dropdown"
-              value={example}
-              options={[
-                { value: 'greeting', label: 'Basic Greeting' },
-                { value: 'fibonacci', label: 'Fibonacci' },
-                { value: 'fizzbuzz', label: 'Fizzbuzz' },
-                { value: 'linked-list', label: 'Linked List (ish)' },
-                { value: 'enums', label: 'Enums' },
-              ]}
-              onChange={({ value }) => {
-                setExample(value as Example)
-                setOutput(<span/>)
-                setIsError(false)
-              }}
-            />
-          </div>
-        </ExampleDropdownContainer>
-      </Title>
+  render() {
+    const { output, disassembled, example } = this.state
 
-      <CodeMirrorEditor
-        value={codeExamples[example]}
-        onRun={onRunCode}
-        onCheck={onCheckCode}
-      />
+    return (
+      <Section>
+        <Title>
+          Try It Out
+          <ExampleDropdownContainer>
+            <label>Example</label>
+            <div style={{ width: 200 }}>
+              <Dropdown
+                className="dropdown"
+                value={example}
+                options={[
+                  { value: 'greeting', label: 'Basic Greeting' },
+                  { value: 'fibonacci', label: 'Fibonacci' },
+                  { value: 'fizzbuzz', label: 'Fizzbuzz' },
+                  { value: 'linked-list', label: 'Linked List (ish)' },
+                  { value: 'enums', label: 'Enums' }
+                ]}
+                onChange={({ value }) => {
+                  this.setState({
+                    example: value as Example,
+                    output: [defaultOutput],
+                    isError: false
+                  })
+                }}
+              />
+            </div>
+          </ExampleDropdownContainer>
+        </Title>
 
-      <Tabs
-        tabs={[
-          {
-            title: 'Results',
-            renderContents: () => (
-              <ResultsView>
-                {!isError && '> '}{output}
-              </ResultsView>
-            )
-          },
-          {
-            title: 'Bytecode',
-            renderContents: () => (
-              <Code language="abrac">
-                {disassembled}
-              </Code>
-            )
-          }
-        ]}
-      />
+        <CodeMirrorEditor
+          value={codeExamples[example]}
+          onRunStart={this.handleRunStart}
+          onRunEnd={this.handleRunEnd}
+          onCheck={this.handleCheckCode}
+        />
 
-      <h4>What's going on here?</h4>
-      <p>
-        This works because the entire language toolchain (lexer, parser, typechecker, compiler, and virtual machine) is
-        compiled to <ExternalLink href="https://webassembly.org/">WebAssembly</ExternalLink>. The same code that powers
-        the native compiler is also running here, with minor amounts of glue code needed to bridge the gap.
-      </p>
-    </Section>
-  )
+        <Tabs
+          tabs={[
+            {
+              title: 'Results',
+              renderContents: () => (
+                <ResultsView>
+                  {output.length
+                    ? output.map(line => <div>{line}</div>)
+                    : <div><span>&nbsp;</span></div>
+                  }
+                </ResultsView>
+              )
+            },
+            {
+              title: 'Bytecode',
+              renderContents: () => (
+                <Code language="abrac">
+                  {disassembled}
+                </Code>
+              )
+            }
+          ]}
+        />
+
+        <h4>What's going on here?</h4>
+        <p>
+          This works because the entire language toolchain (lexer, parser, typechecker, compiler, and virtual machine)
+          is
+          compiled to <ExternalLink href="https://webassembly.org/">WebAssembly</ExternalLink>. The same code that
+          powers
+          the native compiler is also running here, with minor amounts of glue code needed to bridge the gap.
+        </p>
+      </Section>
+    )
+  }
 }
 
 const Title = styled.h1`
