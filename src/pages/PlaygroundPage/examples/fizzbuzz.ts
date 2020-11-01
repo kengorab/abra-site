@@ -1,6 +1,4 @@
 export default `
-// Hint: Check the console for println outputs!
-
 for a in range(1, 101) {
   if a % 15 == 0 {
     println("Fizzbuzz")

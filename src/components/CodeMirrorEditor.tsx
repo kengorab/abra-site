@@ -1,9 +1,7 @@
 import * as React from 'react'
-import styled, { createGlobalStyle } from 'styled-components'
+import { createGlobalStyle } from 'styled-components'
 import { UnControlled as CodeMirror } from 'react-codemirror2'
-import { getSettings, saveSettings } from '../util/local-storage'
-import playButton from '../img/ui-play.svg'
-import resetButton from '../img/refresh.svg'
+import { getSettings } from '../util/local-storage'
 import { run, typecheck } from '../abra-lang/wrapper'
 import * as codemirror from 'codemirror'
 import 'codemirror/addon/edit/closebrackets'
@@ -18,12 +16,11 @@ import '../abra-lang/abra-mode'
 interface Props {
   value: string,
   onCheck: (error: 'wasm' | string | null) => void,
-  onRunStart: () => void,
-  onRunEnd: (result: any, error: string | null, code: string) => void
+  onStdout: (...args: any[]) => void,
+  onResult: (result: any, error: string | null, code: string) => void
 }
 
 interface State {
-  isRunning: boolean,
   isTypecheckError: boolean,
   code: string,
   useVimMode: boolean
@@ -36,7 +33,8 @@ const codeMirrorOpts = {
   lineWrapping: true,
   autoCloseBrackets: true,
   matchBrackets: true,
-  autofocus: true
+  autofocus: true,
+  viewportMargin: Infinity
 }
 
 export default class AbraEditor extends React.Component<Props, State> {
@@ -47,11 +45,14 @@ export default class AbraEditor extends React.Component<Props, State> {
     super(props)
 
     this.state = {
-      isRunning: false,
       isTypecheckError: false,
       code: props.value,
       useVimMode: getSettings().vimModeEnabled
     }
+  }
+
+  componentDidMount() {
+    window.__abra_func__println = (...args: any[]) => this.props.onStdout(...args)
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
@@ -61,26 +62,20 @@ export default class AbraEditor extends React.Component<Props, State> {
   }
 
   run = async () => {
-    const { onRunStart, onRunEnd } = this.props
+    const { onResult } = this.props
     const { code } = this.state
-
-    onRunStart()
-
-    this.setState({ isRunning: true })
 
     try {
       const result = await run(code)
       if (result.success) {
         const { data } = result
-        onRunEnd(data, null, code)
+        onResult(data, null, code)
       } else {
-        onRunEnd(null, result.errorMessage.trimStart(), code)
+        onResult(null, result.errorMessage.trimStart(), code)
       }
     } catch (e) {
       console.error(e)
-      onRunEnd(null, 'Something went wrong, check console', code)
-    } finally {
-      this.setState({ isRunning: false })
+      onResult(null, 'Something went wrong, check console', code)
     }
   }
 
@@ -112,12 +107,11 @@ export default class AbraEditor extends React.Component<Props, State> {
     this.setState({ isTypecheckError: false, code: value })
 
     clearTimeout(this.handle)
-    this.handle = setTimeout(() => this.typecheck(editor, value), 1000)
+    this.handle = setTimeout(() => this.typecheck(editor, value), 500)
   }
 
   render() {
-    const { value } = this.props
-    const { code, useVimMode, isRunning, isTypecheckError } = this.state
+    const { code, useVimMode } = this.state
 
     return (
       <>
@@ -128,97 +122,20 @@ export default class AbraEditor extends React.Component<Props, State> {
           options={{ ...codeMirrorOpts, keyMap: useVimMode ? 'vim' : 'default' }}
           onChange={this.onChange}
         />
-        <Controls>
-          <ButtonGroup>
-            <Button
-              onClick={this.run}
-              disabled={isRunning || isTypecheckError}
-            >
-              <IconImg src={playButton} alt="Play button"/>
-              <span>{isRunning ? 'Running...' : 'Run code'}</span>
-            </Button>
-            <Button onClick={() => this.setState({ code: value })} disabled={isRunning}>
-              <IconImg src={resetButton} alt="Reset button"/>
-              <span>Reset code</span>
-            </Button>
-          </ButtonGroup>
-          <Label htmlFor="use-vim-mode">
-            <input
-              id="use-vim-mode"
-              type="checkbox"
-              checked={useVimMode}
-              onChange={e => {
-                this.setState({ useVimMode: e.target.checked })
-                saveSettings({ vimModeEnabled: e.target.checked })
-              }}
-            />
-            Use vim mode
-          </Label>
-        </Controls>
       </>
     )
   }
 }
 
-const Controls = styled.aside`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  background: #3c3f41;
-  border-top: solid 1px #515151;
-  border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px;
-`
-
-const ButtonGroup = styled.div`
-  display: flex;
-`
-
-const Button = styled.button`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 6px;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  border-radius: 2px;
-  background: transparent;
-  transition: all 200ms ease-in-out;
-  color: white;
-  font-size: 12px;
-  line-height: 12px;
-  
-  &:hover {
-    background: rgba(255,255,255,.125);
-  }
-  
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.75;
-    
-    &:hover {
-      background: transparent;
-    }
-  }
-`
-
-const Label = styled.label`
-  color: white;
-  font-size: 12px;
-  display: flex;
-`
-
-const IconImg = styled.img`
-  width: 12px;
-  margin-right: 4px;
-`
-
 const CodeMirrorStyles = createGlobalStyle`
+  .react-codemirror2 {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
   .CodeMirror {
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    flex: 1;
     padding-top: 12px;
     
     .error-underline {

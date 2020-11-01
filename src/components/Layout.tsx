@@ -11,6 +11,14 @@ export const Main = styled.main`
   padding: calc(${HEADER_HEIGHT}px + 48px) 48px 48px;
 `
 
+export const MainFullWidth = styled.main`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  padding: calc(${HEADER_HEIGHT}px + 24px) 0 0;
+`
+
 export const Section = styled.section`
   flex: 1;
   display: flex;
@@ -23,17 +31,22 @@ export const Layout = styled.div`
   justify-content: center;
 `
 
-export function Header() {
+interface HeaderProps {
+  title?: string,
+  darkMode?: boolean,
+  fullWidth?: boolean
+}
+
+export function Header({ title = 'Abra', darkMode, fullWidth }: HeaderProps) {
   return (
-    <HeaderWrapper>
-      <Container>
+    <HeaderWrapper dark={!!darkMode}>
+      <Container fullWidth={!!fullWidth}>
         <LogoWrapper>
-          <LogoImg src={logo} alt="Abra Language Logo"/>
-          <Title to="/" activeClassName="">Abra</Title>
+          {!fullWidth && <LogoImg src={logo} alt="Abra Language Logo"/>}
+          <Title to="/" activeClassName="">{title}</Title>
         </LogoWrapper>
         <Nav>
           <NavItemLink exact activeClassName="active" to="/">Home</NavItemLink>
-          {/*<NavItem href="/">Getting Started</NavItem>*/}
           <NavItemLink exact activeClassName="active" to="/docs">Documentation</NavItemLink>
           <NavItemLink exact activeClassName="active" to="/try">Try It Out</NavItemLink>
           <NavItem href="https://github.com/kengorab/abra-lang" target="_blank">Github</NavItem>
@@ -43,27 +56,35 @@ export function Header() {
   )
 }
 
-const Container = styled.div`
-  max-width: 1200px;
+const Container = styled.div<{ fullWidth: boolean }>`
+  ${({ fullWidth }) => !fullWidth && 'max-width: 1200px'};
   flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `
 
-const HeaderWrapper = styled.header`
+const HeaderWrapper = styled.header<{ dark: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 12px 24px;
   height: ${HEADER_HEIGHT}px;
-  background-color: #fff5c2;
-  box-shadow: 0 2px 4px #654b472b;
+  background-color: ${({ dark }) => dark ? '#445f6f' : '#fff5c2'};
+  ${({ dark }) => !dark && 'box-shadow: 0 2px 4px #654b472b'};
   z-index: 10;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  
+  a {
+    ${({ dark }) => dark && 'color: #c7c8e2 !important'};
+    
+    &:hover {
+      ${({ dark }) => dark && 'color: #f7ece9 !important'};
+    }
+  }
 `
 
 const Nav = styled.nav`
