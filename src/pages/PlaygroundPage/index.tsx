@@ -24,7 +24,7 @@ interface State {
   isError: boolean,
 }
 
-export default class TryItOutPage2 extends React.Component<{}, State> {
+export default class PlaygroundPage extends React.Component<{}, State> {
   editorRef = React.createRef<CodeMirrorEditor>()
 
   state: State = {
@@ -33,6 +33,20 @@ export default class TryItOutPage2 extends React.Component<{}, State> {
     isRunning: false,
     isError: false
   }
+
+  componentDidMount() {
+    window.addEventListener('keydown', this.handleKeyboardShortcut)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleKeyboardShortcut)
+  }
+
+  handleKeyboardShortcut = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      this.run()
+    }
+  };
 
   handleNoWasm = () => this.setState({ output: [noWasmMessage] })
 
@@ -53,9 +67,9 @@ export default class TryItOutPage2 extends React.Component<{}, State> {
     this.editorRef.current.run()
   }
 
-  handleStdout = (...args: any[]) => {
+  handleStdout = (input: string) => {
     this.setState({
-      output: [...this.state.output, <span>{args.join(' ')}</span>]
+      output: [...this.state.output, <span>{input}</span>]
     })
   }
 
@@ -65,7 +79,7 @@ export default class TryItOutPage2 extends React.Component<{}, State> {
     if (error) {
       this.setState({ output: ([<pre>{error}</pre>]) })
     } else if (result) {
-      this.setState({ output: ([...this.state.output, <span>{JSON.stringify(result)}</span>]) })
+      this.setState({ output: ([...this.state.output, <span>{result}</span>]) })
     }
   }
 
@@ -74,7 +88,11 @@ export default class TryItOutPage2 extends React.Component<{}, State> {
 
     return (
       <ControlBar>
-        <ControlBarButton onClick={this.run} disabled={isRunning || isError}>
+        <ControlBarButton
+          title="Hint: cmd+enter to run"
+          onClick={this.run}
+          disabled={isRunning || isError}
+        >
           &#x25B6; Run
         </ControlBarButton>
 
@@ -133,10 +151,7 @@ const TwoColumnView = styled.div`
   flex: 1;
   display: flex;
   overflow: hidden;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
+  flex-direction: column;
 `
 
 const EditorPane = styled.div`
@@ -149,14 +164,8 @@ const ResultsPane = styled.div`
   flex: 3;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid #445f6f;
-  border-top: none;
+  border-top: 1px solid #445f6f;
   overflow: scroll;
-  
-  @media (max-width: 768px) {
-    border-left: none;
-    border-top: 1px solid #445f6f;
-  }
 `
 
 const Select = styled.select`
@@ -168,9 +177,9 @@ const Select = styled.select`
   border: none;
   cursor: pointer;
   transition: background-color 200ms ease;
-  
+
   &:hover {
-    background: rgba(255,255,255,0.10);
+    background: rgba(255, 255, 255, 0.10);
   }
 `
 
@@ -191,11 +200,11 @@ const ControlBarButton = styled.button`
   border: none;
   outline: none;
   margin: -12px;
-  
+
   &:hover {
     background: ${({ disabled }) => disabled ? '#8d9287' : '#72b111'};
   }
-  
+
   &:active {
     background: #588c0f;
   }
@@ -208,7 +217,7 @@ const ResultsView = styled.code`
   padding: 16px;
   overflow: scroll;
   font-size: 13px;
-  
+
   a, a:visited {
     color: lightskyblue;
     text-decoration: underline;

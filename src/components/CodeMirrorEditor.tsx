@@ -16,7 +16,7 @@ import '../abra-lang/abra-mode'
 interface Props {
   value: string,
   onCheck: (error: 'wasm' | string | null) => void,
-  onStdout: (...args: any[]) => void,
+  onStdout: (input: string) => void,
   onResult: (result: any, error: string | null, code: string) => void
 }
 
@@ -51,10 +51,6 @@ export default class AbraEditor extends React.Component<Props, State> {
     }
   }
 
-  componentDidMount() {
-    window.__abra_func__println = (...args: any[]) => this.props.onStdout(...args)
-  }
-
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (this.props.value !== prevProps.value) {
       this.setState({ code: this.props.value })
@@ -66,10 +62,10 @@ export default class AbraEditor extends React.Component<Props, State> {
     const { code } = this.state
 
     try {
-      const result = await run(code)
+      const result = await run(code, { println: this.props.onStdout })
       if (result.success) {
-        const { data } = result
-        onResult(data, null, code)
+        const { dataToString } = result
+        onResult(dataToString, null, code)
       } else {
         onResult(null, result.errorMessage.trimStart(), code)
       }

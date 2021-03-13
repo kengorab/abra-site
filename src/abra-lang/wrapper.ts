@@ -11,20 +11,26 @@ function init() {
   return _abraInitPromise
 }
 
-export async function typecheck(input: string): Promise<Abra.TypecheckResult | null> {
+export async function typecheck(
+  ...args: Parameters<typeof Abra.typecheck>
+): Promise<Abra.TypecheckResult | null> {
   await init()
 
-  return Abra.typecheck(input)
+  return Abra.typecheck(...args)
 }
 
-export async function run(input: string): Promise<Abra.RunResult> {
+export async function run(
+  ...args: Parameters<typeof Abra.run>
+): Promise<Abra.RunResult> {
   await init()
 
-  return Abra.runAsync(input)
+  return Abra.run(...args)
 }
 
-export async function disassemble(input: string): Promise<Abra.DisassembleResult | null> {
+export async function disassemble(
+  ...args: Parameters<typeof Abra.disassemble>
+): Promise<Abra.DisassembleResult | null> {
   await init()
 
-  return Abra.disassemble(input)
+  return Abra.disassemble(...args)
 }

@@ -33,7 +33,7 @@ export function registerAbraLang() {
       [PR['PR_KEYWORD'], /^\b(?:false|true)\b/i],
 
       // Other keywords
-      [PR['PR_KEYWORD'], /^\b(?:func|type|val|var|if|else|for|in|while|break)\b/i],
+      [PR['PR_KEYWORD'], /^\b(?:val|var|func|if|else|for|in|while|break|type|None|self|enum|import|from|export)\b/i],
 
       // Types are typically capitalized
       [PR['PR_TYPE'], /^[A-Z]\w*/],

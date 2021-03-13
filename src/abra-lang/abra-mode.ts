@@ -12,7 +12,7 @@ interface ModeState {
 }
 
 CodeMirror.defineMode('abra', () => {
-  const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break', 'type', 'None', 'self', 'enum']
+  const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break', 'type', 'None', 'self', 'enum', 'import', 'from', 'export']
   const indentTokens = ['{', '[', '(']
   const unindentTokens = ['}', ']', ')']
 
