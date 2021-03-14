@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { createGlobalStyle } from 'styled-components'
 import { UnControlled as CodeMirror } from 'react-codemirror2'
+import { ModuleReader } from '@kengorab/abra_wasm'
 import { getSettings } from '../util/local-storage'
 import { run, typecheck } from '../abra-lang/wrapper'
 import * as codemirror from 'codemirror'
@@ -13,10 +14,16 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/material.css'
 import '../abra-lang/abra-mode'
 
+interface ModuleManager extends ModuleReader {
+  update(moduleName: string, code: string): void
+}
+
 interface Props {
   value: string,
+  moduleName: string,
+  moduleReader: ModuleManager,
   onCheck: (error: 'wasm' | string | null) => void,
-  onStdout: (input: string) => void,
+  onStdout: (input: string, kind?: 'success' | 'info') => void,
   onResult: (result: any, error: string | null, code: string) => void
 }
 
@@ -58,11 +65,12 @@ export default class AbraEditor extends React.Component<Props, State> {
   }
 
   run = async () => {
-    const { onResult } = this.props
+    const { moduleName, moduleReader, onStdout, onResult } = this.props
     const { code } = this.state
 
+    onStdout(`Running ${moduleName}`, 'success')
     try {
-      const result = await run(code, { println: this.props.onStdout })
+      const result = await run(moduleName, moduleReader, { println: onStdout })
       if (result.success) {
         const { dataToString } = result
         onResult(dataToString, null, code)
@@ -76,11 +84,14 @@ export default class AbraEditor extends React.Component<Props, State> {
   }
 
   typecheck = async (editor: codemirror.Editor, code: string) => {
+    const { moduleName, moduleReader, onCheck } = this.props
+
     try {
-      const result = await typecheck(code)
+      moduleReader.update(moduleName, code)
+      const result = await typecheck(moduleName, moduleReader)
       if (result && !result.success) {
         this.setState({ isTypecheckError: true })
-        this.props.onCheck(result.errorMessage.trimStart())
+        onCheck(result.errorMessage.trimStart())
 
         if (result.error.range) {
           const { start, end } = result.error.range
@@ -90,10 +101,10 @@ export default class AbraEditor extends React.Component<Props, State> {
           this.marks.push(mark)
         }
       } else {
-        this.props.onCheck(null)
+        onCheck(null)
       }
     } catch {
-      this.props.onCheck('wasm')
+      onCheck('wasm')
     }
   }
 
@@ -129,14 +140,14 @@ const CodeMirrorStyles = createGlobalStyle`
     flex-direction: column;
     flex: 1;
   }
-  
+
   .CodeMirror {
     flex: 1;
     padding-top: 12px;
-    
+
     .error-underline {
       text-decoration: underline red;
-      background: #ff000077; 
+      background: #ff000077;
     }
   }
 `

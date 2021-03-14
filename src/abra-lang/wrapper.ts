@@ -12,19 +12,19 @@ function init() {
 }
 
 export async function typecheck(
-  ...args: Parameters<typeof Abra.typecheck>
+  ...args: Parameters<typeof Abra.typecheckModule>
 ): Promise<Abra.TypecheckResult | null> {
   await init()
 
-  return Abra.typecheck(...args)
+  return Abra.typecheckModule(...args)
 }
 
 export async function run(
-  ...args: Parameters<typeof Abra.run>
+  ...args: Parameters<typeof Abra.runModule>
 ): Promise<Abra.RunResult> {
   await init()
 
-  return Abra.run(...args)
+  return Abra.runModule(...args)
 }
 
 export async function disassemble(
