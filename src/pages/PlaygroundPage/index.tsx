@@ -215,10 +215,13 @@ const Tab = styled.div<{ active: boolean }>`
   align-items: center;
   padding: 12px 18px;
   cursor: pointer;
+  color: ${({ active }) => active ? 'white' : 'rgba(255, 255, 255, 0.8)'};
   background: ${({ active }) => active ? '#263238' : 'transparent'};
-  transition: background-color 100ms ease-in-out;
+  transition: all 100ms ease-in-out;
 
   &:hover {
+    color: white;
+    
     ${XButton} {
       opacity: 0.5;
 

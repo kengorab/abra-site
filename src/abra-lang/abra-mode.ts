@@ -8,8 +8,12 @@ interface ModeState {
   baseCol: number,
   indentDepth: number,
   current: HandlerFn,
-  definedTypes: string[]
+  definedTypes: string[],
+  stringInterpolationDelimiter: '}' | 'ident' | null,
+  curlyBraceDepth: number,
 }
+
+const singleCharacterEscapes = ['n', '\\', 'r', 't', '\'', '"', '$']
 
 CodeMirror.defineMode('abra', () => {
   const keywords = ['val', 'var', 'func', 'if', 'else', 'for', 'in', 'while', 'break', 'type', 'None', 'self', 'enum', 'import', 'from', 'export']
@@ -21,8 +25,7 @@ CodeMirror.defineMode('abra', () => {
     if (!ch) return null
 
     if (ch === '"') {
-      state.current = string(ch)
-      return state.current(stream, state)
+      return string(stream, state)
     }
     if (ch === '/') {
       if (stream.eat('/')) {
@@ -56,8 +59,39 @@ CodeMirror.defineMode('abra', () => {
         stream.backUp(backupNum - 1)
       }
 
+      // If we're finished parsing an identifier, check to see if we can terminate any outstanding string interpolations.
+      // We need to check for closing curlies before we return
+      if (state.stringInterpolationDelimiter === 'ident') {
+        state.stringInterpolationDelimiter = null
+        state.current = string
+      } else if (state.stringInterpolationDelimiter === '}' && stream.peek() === '}') {
+        if (state.curlyBraceDepth === 0) {
+          state.stringInterpolationDelimiter = null
+          state.current = stringInterpolation
+        }
+      }
+
       return 'variable'
     }
+
+    // If we're finished parsing a non-identifier expression, check to see if we can terminate any outstanding string
+    // interpolations.
+    if (state.stringInterpolationDelimiter === '}' && stream.peek() === '}') {
+      if (state.curlyBraceDepth === 0) {
+        state.stringInterpolationDelimiter = null
+        state.current = stringInterpolation
+      }
+    }
+
+    // If in a curly-delimited string interpolation, track curly depth; we need to mark the closing } in the interpolation correctly
+    if (state.stringInterpolationDelimiter === '}') {
+      if (ch === '{') {
+        state.curlyBraceDepth++
+      } else if (ch === '}') {
+        state.curlyBraceDepth--
+      }
+    }
+
     return null
   }
 
@@ -75,19 +109,69 @@ CodeMirror.defineMode('abra', () => {
     }
   }
 
-  function string(quote: string): HandlerFn {
-    return function (stream, state) {
-      let escaped = false
-      let ch: string | null
-      while ((ch = stream.next()) != null) {
-        if (ch === quote && !escaped)
-          break
-        escaped = !escaped && ch === '\\'
+  function string(stream: StringStream, state: ModeState) {
+    let escaped = false
+    let ch: string | null
+    while ((ch = stream.peek()) != null) {
+      if (ch === '"' && !escaped) {
+        ch = stream.next()
+        break
       }
-      if (!escaped)
-        state.current = normal
-      return 'string'
+      escaped = !escaped && ch === '\\'
+      if (escaped) {
+        state.current = escapeSequence
+        return 'string'
+      }
+      if (ch === '$') {
+        state.current = stringInterpolation
+        return 'string'
+      }
+      ch = stream.next()
     }
+    if (!escaped)
+      state.current = normal
+    return 'string'
+  }
+
+  function escapeSequence(stream: StringStream, state: ModeState) {
+    stream.next() // Consume '\'
+
+    const ch = stream.next()
+    let type: string
+    if (ch === 'u') {
+      for (let i = 0; i < 4; i++) stream.next()
+      type = 'atom'
+    } else if (ch && singleCharacterEscapes.includes(ch)) {
+      type = 'atom'
+    } else {
+      type = 'error'
+    }
+
+    state.current = string
+    return type
+  }
+
+  function stringInterpolation(stream: StringStream, state: ModeState) {
+    let ch = stream.next()
+    if (ch === '}') { // we're finishing up a previously-started interpolation
+      state.current = string
+      return 'string-2'
+    }
+
+    if (stream.peek() === '{') {
+      stream.next()
+      if (stream.peek() === '}') {
+        stream.next()
+        state.current = string
+        return 'comment'
+      }
+      state.stringInterpolationDelimiter = '}'
+    } else {
+      state.stringInterpolationDelimiter = 'ident'
+    }
+
+    state.current = normal
+    return 'string-2'
   }
 
   function type(stream: StringStream, state: ModeState) {
@@ -108,7 +192,9 @@ CodeMirror.defineMode('abra', () => {
         baseCol: 0,
         indentDepth: 0,
         current: normal,
-        definedTypes: ['Bool', 'Int', 'Float', 'String', 'Unit']
+        definedTypes: ['Bool', 'Int', 'Float', 'String', 'Unit'],
+        stringInterpolationDelimiter: null,
+        curlyBraceDepth: 0
       }
     },
     token(stream, state) {
@@ -128,7 +214,7 @@ CodeMirror.defineMode('abra', () => {
           if (state.definedTypes.includes(word)) return 'variable-2'
           if (!word.includes('<')) return null
 
-          const baseType = word.substring(0, word.indexOf('<'));
+          const baseType = word.substring(0, word.indexOf('<'))
           if (state.definedTypes.includes(baseType)) {
             stream.backUp(word.length - baseType.length)
             return 'variable-2'
