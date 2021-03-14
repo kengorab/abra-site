@@ -1,4 +1,10 @@
-export default `
+export default {
+  label: 'Fibonacci',
+  modules: [
+    {
+      name: '.fibonacci',
+      label: 'fibonacci.abra',
+      code: `
 func fib(n: Int): Int {
   if (n == 0) {
     0
@@ -11,3 +17,6 @@ func fib(n: Int): Int {
 
 fib(12)
 `.trimStart()
+    }
+  ]
+}

@@ -1,4 +1,10 @@
-export default `
+export default {
+  label: 'Enums',
+  modules: [
+    {
+      name: '.enums',
+      label: 'enums.abra',
+      code: `
 enum Color {
   Red
   Green
@@ -14,3 +20,6 @@ enum Color {
 
 Color.Red.hexCode()
 `.trimStart()
+    }
+  ]
+}

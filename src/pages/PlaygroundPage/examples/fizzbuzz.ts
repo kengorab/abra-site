@@ -1,4 +1,10 @@
-export default `
+export default {
+  label: 'Fizzbuzz',
+  modules: [
+    {
+      name: '.fizzbuzz',
+      label: 'fizzbuzz.abra',
+      code: `
 for a in range(1, 101) {
   if a % 15 == 0 {
     println("Fizzbuzz")
@@ -10,3 +16,6 @@ for a in range(1, 101) {
     println(a)
   }
 }`.trimStart()
+    }
+  ]
+}

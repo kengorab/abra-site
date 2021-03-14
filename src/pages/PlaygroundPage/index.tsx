@@ -15,7 +15,7 @@ interface State {
   isError: boolean,
 }
 
-const STARTING_EXAMPLE = examples[5]
+const STARTING_EXAMPLE = examples[0]
 
 export default class PlaygroundPage extends React.Component<{}, State> {
   editorRef = React.createRef<CodeMirrorEditor>()

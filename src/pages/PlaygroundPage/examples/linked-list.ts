@@ -1,4 +1,10 @@
-export default `
+export default {
+  label: 'Linked List (ish)',
+  modules: [
+    {
+      name: '.linked_list',
+      label: 'linked_list.abra',
+      code: `
 type Node<T> {
   value: T
   next: Node<T>? = None
@@ -46,3 +52,6 @@ list.push("a")
 
 list.map<Int>(item => item.length)
 `.trimStart()
+    }
+  ]
+}
