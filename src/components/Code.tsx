@@ -1,47 +1,54 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { VsCodeThemeStyles } from '../prettier-languages'
-import 'code-prettify'
-import 'code-prettify/src/run_prettify'
+import Codemirror from 'codemirror'
+import 'codemirror/addon/runmode/runmode'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/material.css'
+import '../abra-lang/abra-mode'
 
 interface Props {
   children: string,
-  language?: 'abra' | 'abrac',
-  style?: React.CSSProperties
 }
 
-export default function Code({ children, style, language = 'abra' }: Props) {
-  const pre = React.createRef<HTMLPreElement>()
-
-  // Split into lines, removing any empty lines at start and end (but keeping empty lines in middle)
-  const codeLines = children.trimEnd()
-    .split('\n')
-    .filter((line, idx) => idx !== 0 || line.length)
-  const indentation = codeLines[0] ? codeLines[0].length - codeLines[0].trimStart().length : 0
-  const code = codeLines.map(line => line.substring(indentation, line.length)).join('\n')
+export default function Code({ children }: Props) {
+  const ref = React.createRef<HTMLPreElement>()
 
   React.useLayoutEffect(() => {
-    if (pre.current) {
-      pre.current.classList.remove('prettyprinted')
-    }
-    window.PR.prettyPrint()
-  }, [pre, code])
+    const code = unindent(children)
 
-  return (
-    <>
-      <VsCodeThemeStyles/>
-      <Pre ref={pre} className={`prettyprint lang-${language}`} style={style || {}}>
-        {code}
-      </Pre>
-    </>
-  )
+    // @ts-ignore: this function is an addon, and isn't present in the type definitions
+    Codemirror.runMode(code, 'abra', ref.current)
+  }, [ref, children])
+
+  return <Pre ref={ref} className="CodeMirror cm-s-material"/>
+}
+
+function unindent(str: string): string {
+  const lines = str.split('\n')
+
+  let startIdx = 0
+  for (; startIdx < lines.length; startIdx++) {
+    if (lines[startIdx].trim()) break
+  }
+  let endIdx = lines.length - 1
+  for (; endIdx >= 0; endIdx--) {
+    if (lines[endIdx].trim()) break
+  }
+
+  const firstLine = lines[startIdx]
+  if (!firstLine) return str
+  const indentation = firstLine.search(/\S/)
+
+  return lines.slice(startIdx, endIdx + 1)
+    .map(line => line.substring(indentation))
+    .join('\n')
 }
 
 const Pre = styled.pre`
-  padding: 16px !important; // Need to override prettyprint's default for padding
+  height: auto !important; // Need to override codemirror's default 300px height
+  padding: 16px; 
   border-radius: 6px;
   max-width: 100%;
   max-height: 300px;
   overflow: scroll;
 `
-
