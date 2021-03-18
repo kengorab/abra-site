@@ -9,7 +9,7 @@ module.exports = (webpackConfig) => {
     use: 'raw-loader'
   })
   const catchall = rules[rules.length - 2]
-  const fileLoaderConfig = catchall.oneOf.find(({ loader }) => loader?.includes('file-loader'))
+  const fileLoaderConfig = catchall.oneOf.find(({ loader }) => loader && loader.includes('file-loader'))
   fileLoaderConfig.exclude.push(/\.md$/)
 
   return webpackConfig
