@@ -7,14 +7,19 @@ import 'codemirror/theme/material.css'
 import '../abra-lang/abra-mode'
 
 interface Props {
-  children: string,
+  children: string | string[],
 }
 
 export default function Code({ children }: Props) {
   const ref = React.createRef<HTMLPreElement>()
 
   React.useLayoutEffect(() => {
-    const code = unindent(children)
+    let code: string
+    if (typeof children === 'string') {
+      code = unindent(children)
+    } else {
+      code = unindent(children[0])
+    }
 
     // @ts-ignore: this function is an addon, and isn't present in the type definitions
     Codemirror.runMode(code, 'abra', ref.current)
@@ -46,9 +51,9 @@ function unindent(str: string): string {
 
 const Pre = styled.pre`
   height: auto !important; // Need to override codemirror's default 300px height
-  padding: 16px; 
+  overflow: scroll !important; // Need to override codemirror's default overflow: hidden
+  padding: 16px;
   border-radius: 6px;
   max-width: 100%;
   max-height: 300px;
-  overflow: scroll;
 `

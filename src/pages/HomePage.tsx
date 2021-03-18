@@ -14,8 +14,7 @@ export default function HomePage() {
       </p>
       <p>
         It is still <em>very much</em> a work in progress, and things should be expected to change/break frequently.
-        <br/>
-        (Not even all of what I'd consider to be table-stakes language features have been fully implemented yet. <br/>
+        (Not even all of what I'd consider to be table-stakes language features have been fully implemented yet.
         You can check the <a href={githubLink}>projects</a> pages in Github to watch progress)
       </p>
 

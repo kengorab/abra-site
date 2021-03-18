@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@kengorab/abra_wasm": "^0.6.9",
-    "codemirror": "^5.48.0",
+    "codemirror": "5.48.0",
     "react": "^16.8.6",
     "react-codemirror2": "^6.0.0",
     "react-dom": "^16.8.6",
@@ -12,14 +12,18 @@
     "react-router-dom": "^5.0.1",
     "react-router-hash-link": "^1.2.1",
     "react-scripts": "3.0.1",
+    "remark-parse": "^9.0.0",
+    "remark-react": "^8.0.0",
+    "remark-slug": "^6.0.0",
     "styled-components": "^4.3.2",
-    "typescript": "3.5.3"
+    "typescript": "3.5.3",
+    "unified": "^9.2.1"
   },
   "scripts": {
     "postinstall": "cp node_modules/@kengorab/abra_wasm/abra_wasm_bg.wasm public/abra_wasm/abra_wasm_bg.wasm",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "devDependencies": {
@@ -31,7 +35,9 @@
     "@types/react-responsive": "^8.0.2",
     "@types/react-router-dom": "^4.3.4",
     "@types/react-router-hash-link": "^1.2.1",
-    "@types/styled-components": "^4.1.16"
+    "@types/styled-components": "^4.1.16",
+    "raw-loader": "^4.0.2",
+    "react-app-rewired": "^2.1.8"
   },
   "eslintConfig": {
     "extends": "react-app"

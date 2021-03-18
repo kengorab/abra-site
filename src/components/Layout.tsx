@@ -15,7 +15,7 @@ export const Main = styled.main`
   
   @media(max-width: ${MOBILE_WIDTH}px) {
     max-width: 100%;
-    padding: calc(${HEADER_HEIGHT}px + 24px) 24px 24px;
+    padding: calc(${HEADER_HEIGHT}px + 24px) 12px 24px;
   }
 `
 
@@ -25,6 +25,8 @@ export const MainFullWidth = styled.main`
   flex: 1;
   width: 100%;
   padding: calc(${HEADER_HEIGHT}px + 24px) 0 0;
+  height: 100vh;
+  box-sizing: border-box;
 `
 
 export const Section = styled.section`

@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { HashLink } from 'react-router-hash-link'
 import { Section } from '../components/Layout'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 import Code from '../components/Code'
 
 export default function DocumentationPage() {
   return (
     <Section>
+      <HeaderHashLinkStyles/>
       <DocSection>
         <LinkedH2 hash="literals">Literals</LinkedH2>
         <p>
@@ -107,7 +108,8 @@ export default function DocumentationPage() {
           <b>Abra</b> takes the middle road: an array indexing operation will always succeed and will always return a
           "box", which may or may not contain a value. One way to "unbox" this value is to use
           the <em>coalescing</em> operator (<code>?:</code>), also called the "Elvis operator" in some languages. This
-          operator will either unbox the <code>Optional</code> and return what's inside, or will provide a given fallback.
+          operator will either unbox the <code>Optional</code> and return what's inside, or will provide a given
+          fallback.
         </p>
         <Code>
           {`
@@ -121,9 +123,10 @@ export default function DocumentationPage() {
           `}
         </Code>
         <p>
-          There's another operator that makes it convenient to work with <code>Optional</code> types: the <code>?.</code>
-          operator. This allows for an <code>Optional</code>-safe way of accessing properties of variables without manually
-          "unwrapping" the value. For example, if we wanted to get the length of a string contained within an array:
+          There's another operator that makes it convenient to work with <code>Optional</code> types:
+          the <code>?.</code> operator. This allows for an <code>Optional</code>-safe way of accessing properties of
+          variables without manually "unwrapping" the value. For example, if we wanted to get the length of a string
+          contained within an array:
         </p>
         <Code>
           {`
@@ -137,9 +140,9 @@ export default function DocumentationPage() {
         <p>
           The <code>rightLength</code> variable will be of type <code>Int?</code>. Essentially, what happens here is
           this: since the code can't be sure if the variable <code>brian</code> holds a value or not, we can use the
-          <code>Optional</code>-safe operator (<code>?.</code>) to access its <code>length</code> property. If the variable
-          holds a value, it will get the <code>length</code> property off of the variable; if it does <i>not</i> hold a
-          value, it will just short-circuit and produce the value of <code>None</code>.
+          <code>Optional</code>-safe operator (<code>?.</code>) to access its <code>length</code> property. If the
+          variable holds a value, it will get the <code>length</code> property off of the variable; if it
+          does <i>not</i> hold a value, it will just short-circuit and produce the value of <code>None</code>.
         </p>
       </DocSection>
 
@@ -169,9 +172,9 @@ export default function DocumentationPage() {
         </Code>
         <p>
           Functions can also be declared with default argument values. This makes those parameters optional when
-          calling that function; if no value for that parameter is passed, the default value will be provided to the function
-          body. Arguments with default values will have their type be inferred from the default value, if no type
-          annotation is present. Note that all optional (aka default-valued) parameters must come at the end of the
+          calling that function; if no value for that parameter is passed, the default value will be provided to the
+          function body. Arguments with default values will have their type be inferred from the default value, if no
+          type annotation is present. Note that all optional (aka default-valued) parameters must come at the end of the
           argument list; there can be no required (aka <em>non</em>-default-valued) parameters among the optional ones.
         </p>
         <Code>
@@ -192,10 +195,10 @@ export default function DocumentationPage() {
         <LinkedH3 hash="functions-calling">Calling Functions</LinkedH3>
         <p>
           Functions are called by using parentheses to pass in arguments, much like you'd expect. In <b>Abra</b>, you
-          may take a <em>named-arguments</em> approach to provide additional clarity. These named arguments may be passed
-          in any order, but you cannot mix named and unnamed parameters (it's all or nothing). It's especially helpful
-          to use named-arguments when passing in a literal value (as opposed to a variable, which can have some intent
-          ascribed to it via its name).
+          may take a <em>named-arguments</em> approach to provide additional clarity. These named arguments may be
+          passed in any order, but you cannot mix named and unnamed parameters (it's all or nothing). It's especially
+          helpful to use named-arguments when passing in a literal value (as opposed to a variable, which can have some
+          intent ascribed to it via its name).
         </p>
         <p>
           Parameters with default values will be set to those values upon calling the function. The default value will
@@ -217,8 +220,8 @@ export default function DocumentationPage() {
         <LinkedH3 hash="functions-lambdas">Lambda Functions</LinkedH3>
         <p>
           There's also a syntax for anonymous lambda functions in <b>Abra</b>, which follows after Typescript's arrow
-          function syntax. Arguments are in parentheses followed by their type annotations, then an arrow (<code>=></code>)
-          and then either a single expression or a block.
+          function syntax. Arguments are in parentheses followed by their type annotations, then an arrow
+          (<code>=></code>) and then either a single expression or a block.
         </p>
         <Code>
           {`
@@ -300,10 +303,10 @@ export default function DocumentationPage() {
           `}
         </Code>
         <p>
-          When a type is declared in this way, there will also be a function declared with the same name as the type, which
-          has arguments that match that type's fields. This is like a <i>constructor</i> in other languages, and is used to
-          create new instances of that type. Much like how regular function work (see the section above on Functions), these
-          parameters can be passed in any order.
+          When a type is declared in this way, there will also be a function declared with the same name as the type,
+          which has arguments that match that type's fields. This is like a <i>constructor</i> in other languages, and
+          is used to create new instances of that type. Much like how regular function work (see the section above on
+          Functions), these parameters can be passed in any order.
         </p>
         <Code>
           {`
@@ -326,8 +329,8 @@ export default function DocumentationPage() {
           `}
         </Code>
         <p>
-          Fields on an instance of a type can be accessed using the dot operator, much like you may be used to from other
-          languages. You can also use the same idea to update an instance's fields.
+          Fields on an instance of a type can be accessed using the dot operator, much like you may be used to from
+          other languages. You can also use the same idea to update an instance's fields.
         </p>
         <Code>
           {`
@@ -341,8 +344,9 @@ export default function DocumentationPage() {
 
         <LinkedH3 hash="types-creating-methods">Methods on Types</LinkedH3>
         <p>
-          Methods can also be declared within a <code>type</code> declaration. Functions with <code>self</code> as the first
-          parameter will be <i>instance methods</i>, and functions without <code>self</code> will be <i>static methods</i>.
+          Methods can also be declared within a <code>type</code> declaration. Functions with <code>self</code> as the
+          first parameter will be <i>instance methods</i>, and functions without <code>self</code> will be
+          <i>static methods</i>.
         </p>
         <Code>
           {`
@@ -505,8 +509,8 @@ export default function DocumentationPage() {
         <LinkedH3 hash="control-convenience-variables">Convenience variables</LinkedH3>
         <p>
           Oftentimes it's useful in control structures to have a convenient way to access the evaluated condition. For
-          cases where the condition is a <code>boolean</code> it might not be apparent, but it <em>is</em> useful when the
-          condition is an <code>Optional</code>.
+          cases where the condition is a <code>boolean</code> it might not be apparent, but it <em>is</em> useful when
+          the condition is an <code>Optional</code>.
         </p>
         <Code>
           {`
@@ -519,8 +523,8 @@ export default function DocumentationPage() {
           `}
         </Code>
         <p>
-          If this is done for a <code>boolean</code> condition, the variable is guaranteed to always be <code>true</code>,
-          so while it is possible to write code such as the following, it's not very useful:
+          If this is done for a <code>boolean</code> condition, the variable is guaranteed to always
+          be <code>true</code>, so while it is possible to write code such as the following, it's not very useful:
         </p>
         <Code>
           {`
@@ -551,14 +555,27 @@ const DocSection = styled.section`
   margin-bottom: 24px;
 `
 
+const HeaderHashLinkStyles = createGlobalStyle`
+  h2::before,
+  h3::before,
+  h4::before {
+    display: block;
+    content: " ";
+    margin-top: -88px;
+    height: 88px;
+    visibility: hidden;
+    pointer-events: none;
+  }
+`
+
 function LinkedH2({ hash, children }: { hash: string, children: string | JSX.Element }) {
-  return <h2 id={hash}><HashLink to={`#${hash}`}> {children} </HashLink></h2>
+  return <h2 id={hash}><HashLink to={`#${hash}`}>{children}</HashLink></h2>
 }
 
 function LinkedH3({ hash, children }: { hash: string, children: string | JSX.Element }) {
-  return <h3 id={hash}><HashLink to={`#${hash}`}> {children} </HashLink></h3>
+  return <h3 id={hash}><HashLink to={`#${hash}`}>{children}</HashLink></h3>
 }
 
 function LinkedH4({ hash, children }: { hash: string, children: string | JSX.Element }) {
-  return <h4 id={hash}><HashLink to={`#${hash}`}> {children} </HashLink></h4>
+  return <h4 id={hash}><HashLink to={`#${hash}`}>{children}</HashLink></h4>
 }
