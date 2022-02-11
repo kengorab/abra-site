@@ -2,7 +2,7 @@ export default {
   label: 'Greeting',
   modules: [
     {
-      name: '.greeting',
+      name: './greeting',
       label: 'greeting.abra',
       code: `
 val greeting = "Hello"

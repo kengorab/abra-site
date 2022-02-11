@@ -2,7 +2,7 @@ export default {
   label: 'Fizzbuzz',
   modules: [
     {
-      name: '.fizzbuzz',
+      name: './fizzbuzz',
       label: 'fizzbuzz.abra',
       code: `
 for a in range(1, 101) {

@@ -2,7 +2,7 @@ export default {
   label: 'Fibonacci',
   modules: [
     {
-      name: '.fibonacci',
+      name: './fibonacci',
       label: 'fibonacci.abra',
       code: `
 func fib(n: Int): Int {

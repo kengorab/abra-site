@@ -2,12 +2,12 @@ export default {
   label: 'Imports/Exports',
   modules: [
     {
-      name: '.main',
+      name: './main',
       label: 'main.abra',
       code: `
-import Ship from .ship
-import Person from .person
-import prettyPrint from .util
+import Ship from "./ship"
+import Person from "./person"
+import prettyPrint from "./util"
 
 val ship = Ship(
   name: "Planet Express Ship",
@@ -22,7 +22,7 @@ println(prettyPrint(ship))
 `.trimStart()
     },
     {
-      name: '.person',
+      name: './person',
       label: 'person.abra',
       code: `
 export type Person {
@@ -33,10 +33,10 @@ export type Person {
 `.trimStart()
     },
     {
-      name: '.ship',
+      name: './ship',
       label: 'ship.abra',
       code: `
-import Person from .person
+import Person from "./person"
 
 export type Ship {
   name: String
@@ -45,11 +45,11 @@ export type Ship {
 `.trimStart()
     },
     {
-      name: '.util',
+      name: './util',
       label: 'util.abra',
       code: `
-import Ship from .ship
-import Person from .person
+import Ship from "./ship"
+import Person from "./person"
 
 // Ugly prettyPrint function, nothing to see here 🙈
 export func prettyPrint(ship: Ship): String {

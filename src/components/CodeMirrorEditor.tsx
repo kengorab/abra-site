@@ -93,13 +93,11 @@ export default class AbraEditor extends React.Component<Props, State> {
         this.setState({ isTypecheckError: true })
         onCheck(result.errorMessage.trimStart())
 
-        if (result.error.range) {
-          const { start, end } = result.error.range
-          const from = { line: start[0] - 1, ch: start[1] - 1 }
-          const to = { line: end[0] - 1, ch: end[1] }
-          const mark = editor.getDoc().markText(from, to, { className: 'error-underline' })
-          this.marks.push(mark)
-        }
+        const { start, end } = result.range
+        const from = { line: start[0] - 1, ch: start[1] - 1 }
+        const to = { line: end[0] - 1, ch: end[1] }
+        const mark = editor.getDoc().markText(from, to, { className: 'error-underline' })
+        this.marks.push(mark)
       } else {
         onCheck(null)
       }

@@ -30,13 +30,22 @@ export default class PlaygroundPage extends React.Component<{}, State> {
       or try again.
     </ConsoleMessage>
   )
+  /*
+    const moduleLoader = {
+        resolveModulePath(moduleId: string, _withRespectTo: string) { return moduleId },
+        readModule(moduleName: string) { return modules[moduleName] },
+        getModuleName(moduleName: string) { return moduleName }
+    }
+   */
 
   moduleReader = {
+    resolveModulePath: (moduleId: string, _withRespectTo: string) => moduleId,
     readModule: (moduleName: string) => {
       const module = this.state.example.modules.find(m => m.name === moduleName)
       if (!module) return null
       return module.code
     },
+    getModuleName: (moduleName: string) => moduleName,
     update: (moduleName: string, code: string) => {
       const example = this.state.example
       example.modules.find(m => m.name === moduleName)!.code = code

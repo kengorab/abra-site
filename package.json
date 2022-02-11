@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@kengorab/abra_wasm": "^0.6.9",
+    "@kengorab/abra_wasm": "^0.8.1",
     "codemirror": "5.48.0",
     "react": "^16.8.6",
     "react-codemirror2": "^6.0.0",

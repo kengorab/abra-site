@@ -2,8 +2,8 @@ export default {
   label: 'Linked List (ish)',
   modules: [
     {
-      name: '.linked_list',
-      label: 'linked_list.abra',
+      name: './linked-list',
+      label: 'linked-list.abra',
       code: `
 type Node<T> {
   value: T
@@ -28,9 +28,7 @@ type LinkedList<T> {
   func map<U>(self, fn: (T) => U): U[] {
     val newArr: U[] = []
 
-    self.forEach(item => {
-      newArr.push(fn(item))
-    })
+    self.forEach(item => newArr.push(fn(item)))
     
     newArr
   }

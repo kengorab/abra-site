@@ -2,7 +2,7 @@ export default {
   label: 'Enums',
   modules: [
     {
-      name: '.enums',
+      name: './enums',
       label: 'enums.abra',
       code: `
 enum Color {
